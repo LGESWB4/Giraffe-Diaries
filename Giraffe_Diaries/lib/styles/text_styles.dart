@@ -81,4 +81,4 @@ class AppTextStyles {
     fontWeight: FontWeight.w500,
     letterSpacing: -0.2,
   );
-} 
+}
