@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../controllers/style_select_controller.dart';
 import '../widgets/style_item.dart';
 import '../styles/text_styles.dart';
+import '../widgets/exit_confirmation_dialog.dart';
 
 class StyleSelectScreen extends GetView<StyleSelectController> {
   const StyleSelectScreen({Key? key}) : super(key: key);
@@ -23,7 +24,7 @@ class StyleSelectScreen extends GetView<StyleSelectController> {
         actions: [
           IconButton(
             icon: const Icon(Icons.close, color: Colors.black),
-            onPressed: () => controller.showExitDialog(),
+            onPressed: () => Get.dialog(const ExitConfirmationDialog(), barrierDismissible: false,),
           ),
         ],
       ),

@@ -20,14 +20,7 @@ class StyleSelectController extends GetxController {
     selectedStyle.value = index;
   }
 
-  void showExitDialog() {
-    Get.dialog(
-      const ExitConfirmationDialog(),
-      barrierDismissible: false,
-    );
-  }
-
-  void skipSelection() {
+  void skipSelection() { // TODO : 그림 일기로 이동
     Get.back();  // 또는 다음 화면으로 이동하는 로직
   }
 
