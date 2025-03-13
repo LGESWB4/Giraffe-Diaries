@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../controllers/style_select_controller.dart';
 import '../widgets/style_item.dart';
 import '../styles/text_styles.dart';
+import '../widgets/exit_confirmation_dialog.dart';
 
 class StyleSelectScreen extends GetView<StyleSelectController> {
   final DateTime selectedDate;
@@ -30,7 +31,7 @@ class StyleSelectScreen extends GetView<StyleSelectController> {
         actions: [
           IconButton(
             icon: const Icon(Icons.close, color: Colors.black),
-            onPressed: () => controller.showExitDialog(),
+            onPressed: () => Get.dialog(const ExitConfirmationDialog(), barrierDismissible: false,),
           ),
         ],
       ),
@@ -48,7 +49,7 @@ class StyleSelectScreen extends GetView<StyleSelectController> {
                 const SizedBox(height: 8),
                 Text(
                   '기본은 수채화 스타일입니다',
-                  style: AppTextStyles.bodyMedium.copyWith(
+                  style: AppTextStyles.bodyLarge.copyWith(
                     color: Colors.grey[600],
                   ),
                   textAlign: TextAlign.center,

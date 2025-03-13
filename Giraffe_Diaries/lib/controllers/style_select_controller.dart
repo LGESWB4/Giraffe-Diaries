@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import '../screens/image_loading_screen.dart';
 import '../controllers/image_generation_controller.dart';
+import '../widgets/exit_confirmation_dialog.dart';
 
 class StyleSelectController extends GetxController {
   final RxInt selectedStyle = (-1).obs;  // -1은 선택되지 않은 상태
@@ -28,65 +29,7 @@ class StyleSelectController extends GetxController {
     selectedStyle.value = index;
   }
 
-  void showExitDialog() {
-    Get.dialog(
-      AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        title: const Text(
-          '그만 쓰고 나갈까요?',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
-          textAlign: TextAlign.center,
-        ),
-        actionsAlignment: MainAxisAlignment.center,
-        actionsPadding: const EdgeInsets.only(bottom: 16),
-        actions: [
-          TextButton(
-            onPressed: () => Get.back(),  // 다이얼로그 닫기
-            child: Text(
-              '취소',
-              style: TextStyle(
-                color: Colors.grey[600],
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-          const SizedBox(width: 16),
-          ElevatedButton(
-            onPressed: () {
-              Get.back();  // 다이얼로그 닫기
-              Get.back();  // 화면 닫기
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFF6AD62),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              padding: const EdgeInsets.symmetric(
-                horizontal: 24,
-                vertical: 12,
-              ),
-            ),
-            child: const Text(
-              '확인',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-        ],
-      ),
-      barrierDismissible: false,  // 배경 터치로 닫기 방지
-    );
-  }
-
-  void skipSelection() {
+  void skipSelection() { // TODO : 그림 일기로 이동
     Get.back();  // 또는 다음 화면으로 이동하는 로직
   }
 
@@ -98,4 +41,4 @@ class StyleSelectController extends GetxController {
       Get.to(() => ImageLoadingScreen(selectedDate: selectedDate, contenttext: contenttext));  // 또는 다음 화면으로 이동하는 로직
     }
   }
-} 
+}
