@@ -68,6 +68,7 @@ class HomeScreen extends GetView<CalendarController> {
                           return Container(
                             height: 300,
                             padding: const EdgeInsets.all(20),
+                            color: Colors.white,  // 바텀시트 배경색을 흰색으로 설정
                             child: Column(
                               children: [
                                 Text(
@@ -75,6 +76,7 @@ class HomeScreen extends GetView<CalendarController> {
                                   style: const TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
+                                    color: customOrange,
                                   ),
                                 ),
                                 const SizedBox(height: 20),
@@ -246,9 +248,9 @@ class HomeScreen extends GetView<CalendarController> {
                         width: 35,
                         height: 35,
                         margin: const EdgeInsets.only(top: 12),
-                        decoration: const BoxDecoration(
+                        decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Color(0xFFE5E5E5),
+                          color: controller.getMarkerColor('default|${controller.events[date]?.first.split('|')[1]}'),
                         ),
                       ),
                     );
