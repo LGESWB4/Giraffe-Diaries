@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import '../screens/style_select_screen.dart';
 
 class DiaryController extends GetxController {
   final TextEditingController contentController = TextEditingController();
@@ -23,7 +24,9 @@ class DiaryController extends GetxController {
   }
 
   void saveDiary() {
-    // TODO: 일기 저장 로직 구현
-    Get.back();
+    if (contentController.text.trim().isNotEmpty) {
+      // 스타일 선택 화면으로 이동
+      Get.to(() => const StyleSelectScreen());
+    }
   }
 }
