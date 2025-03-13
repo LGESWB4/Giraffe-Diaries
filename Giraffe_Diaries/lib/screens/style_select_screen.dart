@@ -41,7 +41,7 @@ class StyleSelectScreen extends GetView<StyleSelectController> {
                 const SizedBox(height: 8),
                 Text(
                   '기본은 수채화 스타일입니다',
-                  style: AppTextStyles.bodyMedium.copyWith(
+                  style: AppTextStyles.bodyLarge.copyWith(
                     color: Colors.grey[600],
                   ),
                   textAlign: TextAlign.center,

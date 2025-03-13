@@ -41,7 +41,7 @@ class StyleItem extends StatelessWidget {
             Text(
               name,
               style: AppTextStyles.bodyLarge.copyWith(
-                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                 color: isSelected ? const Color(0xFFF6AD62) : Colors.black,
                 fontSize: 20,
                 height: 1.2,
