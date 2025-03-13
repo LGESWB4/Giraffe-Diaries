@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../controllers/calendar_controller.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import '../screens/diary_write_screen.dart';
 
 class HomeScreen extends GetView<CalendarController> {
   const HomeScreen({Key? key}) : super(key: key);
@@ -19,12 +20,8 @@ class HomeScreen extends GetView<CalendarController> {
   );
 
   // 공통 메서드
-  void showDiaryWriteSnackbar(DateTime date) {
-    Get.snackbar(
-      '알림',
-      '${date.month}월 ${date.day}일의 일기를 작성합니다.',
-      snackPosition: SnackPosition.BOTTOM,
-    );
+  void showDiaryWriteScreen(DateTime date) {
+    Get.to(() => DiaryWriteScreen(selectedDate: date));
   }
 
   Widget buildDateContainer({
@@ -220,7 +217,7 @@ class HomeScreen extends GetView<CalendarController> {
                       return InkWell(
                         onTap: () {
                           controller.onDaySelected(date, date);
-                          showDiaryWriteSnackbar(date);
+                          showDiaryWriteScreen(date);
                         },
                         child: Container(
                           width: 35,
@@ -242,7 +239,7 @@ class HomeScreen extends GetView<CalendarController> {
                     return InkWell(
                       onTap: () {
                         controller.onDaySelected(date, date);
-                        showDiaryWriteSnackbar(date);
+                        showDiaryWriteScreen(date);
                       },
                       child: Container(
                         width: 35,
@@ -327,7 +324,7 @@ class HomeScreen extends GetView<CalendarController> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => showDiaryWriteSnackbar(controller.selectedDay.value),
+        onPressed: () => showDiaryWriteScreen(controller.selectedDay.value),
         backgroundColor: const Color(0xFFF6AD62),
         child: const Icon(Icons.add),
       ),
