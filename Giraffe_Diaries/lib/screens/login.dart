@@ -28,7 +28,7 @@ class LoginScreen extends StatelessWidget {
               Text(
                 '내 이름은 기린! 넌?',
                 textAlign: TextAlign.center,
-                style: AppTextStyle.heading1.copyWith(
+                style: AppTextStyles.heading3.copyWith(
                   color: Colors.black,
                   height: 1.5,
                 ),
@@ -37,15 +37,15 @@ class LoginScreen extends StatelessWidget {
               TextField(
                 controller: nicknameController,
                 decoration: InputDecoration(
-                  labelStyle: AppTextStyle.medium,
+                  labelStyle: AppTextStyles.bodyMedium,
                   hintText: '사용하실 닉네임을 입력해주세요',
-                  hintStyle: AppTextStyle.body2,
+                  hintStyle: AppTextStyles.bodyMedium,
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(15),
                     borderSide: const BorderSide(color: Color(0xFFF6AD62), width: 2),
                   ),
                 ),
-                style: AppTextStyle.body1,
+                style: AppTextStyles.bodyMedium,
               ),
               const SizedBox(height: 20),
               SizedBox(
@@ -65,7 +65,7 @@ class LoginScreen extends StatelessWidget {
                   ),
                   child: const Text(
                     '시작하기',
-                    style: AppTextStyle.semiBold,
+                    style: AppTextStyles.buttonText,
                   ),
                 ),
               ),

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:giraffe_diaries/controllers/auth_controller.dart';
 import 'dart:async';
-import 'login.dart';
+import '../styles/text_styles.dart';
 
 class HomeLoadingScreen extends StatefulWidget {
   const HomeLoadingScreen({super.key});
@@ -24,10 +25,10 @@ class _HomeLoadingScreenState extends State<HomeLoadingScreen> {
       });
     });
 
-    // 3초 후 로그인 화면으로 이동
+    // 3초 후 로그인 상태 확인
     Future.delayed(const Duration(seconds: 3), () {
       _imageTimer.cancel();
-      Get.off(() => LoginScreen());
+      Get.put(AuthController());
     });
   }
 
@@ -53,11 +54,7 @@ class _HomeLoadingScreenState extends State<HomeLoadingScreen> {
             const SizedBox(height: 30),
             const Text(
               '네가그린기린일기',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
+              style: AppTextStyles.heading2,
             ),
           ],
         ),

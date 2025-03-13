@@ -1,35 +1,84 @@
 import 'package:flutter/material.dart';
 
-class AppTextStyle {
-  static const TextStyle light = TextStyle(
-    fontFamily: 'AppleSDGothicNeoM',
-    fontWeight: FontWeight.w300,
+class AppTextStyles {
+  // Heading Styles
+  static const TextStyle heading1 = TextStyle(
+    fontFamily: 'AppleSDGothicNeo',
+    fontSize: 28,
+    fontWeight: FontWeight.bold,
+    letterSpacing: -0.5,
   );
 
-  static const TextStyle regular = TextStyle(
-    fontFamily: 'AppleSDGothicNeoM',
-    fontWeight: FontWeight.w400,
+  static const TextStyle heading2 = TextStyle(
+    fontFamily: 'AppleSDGothicNeo',
+    fontSize: 24,
+    fontWeight: FontWeight.bold,
+    letterSpacing: -0.5,
   );
 
-  static const TextStyle medium = TextStyle(
-    fontFamily: 'AppleSDGothicNeoM',
+  static const TextStyle heading3 = TextStyle(
+    fontFamily: 'AppleSDGothicNeo',
+    fontSize: 20,
+    fontWeight: FontWeight.bold,
+    letterSpacing: -0.5,
+  );
+
+  // Body Styles
+  static const TextStyle bodyLarge = TextStyle(
+    fontFamily: 'AppleSDGothicNeo',
+    fontSize: 16,
     fontWeight: FontWeight.w500,
+    letterSpacing: -0.3,
   );
 
-  static const TextStyle semiBold = TextStyle(
-    fontFamily: 'AppleSDGothicNeoM',
+  static const TextStyle bodyMedium = TextStyle(
+    fontFamily: 'AppleSDGothicNeo',
+    fontSize: 14,
+    fontWeight: FontWeight.normal,
+    letterSpacing: -0.3,
+  );
+
+  static const TextStyle bodySmall = TextStyle(
+    fontFamily: 'AppleSDGothicNeo',
+    fontSize: 12,
+    fontWeight: FontWeight.normal,
+    letterSpacing: -0.2,
+  );
+
+  // Calendar Styles
+  static const TextStyle calendarHeader = TextStyle(
+    fontFamily: 'AppleSDGothicNeo',
+    fontSize: 20,
+    fontWeight: FontWeight.bold,
+    letterSpacing: -0.5,
+  );
+
+  static const TextStyle calendarWeekday = TextStyle(
+    fontFamily: 'AppleSDGothicNeo',
+    fontSize: 14,
     fontWeight: FontWeight.w600,
+    letterSpacing: -0.3,
   );
 
-  static const TextStyle bold = TextStyle(
-    fontFamily: 'AppleSDGothicNeoM',
-    fontWeight: FontWeight.w700,
+  static const TextStyle calendarDay = TextStyle(
+    fontFamily: 'AppleSDGothicNeo',
+    fontSize: 14,
+    fontWeight: FontWeight.normal,
+    letterSpacing: -0.3,
   );
 
-  // 자주 사용하는 크기별 스타일
-  static TextStyle heading1 = bold.copyWith(fontSize: 24);
-  static TextStyle heading2 = semiBold.copyWith(fontSize: 20);
-  static TextStyle body1 = regular.copyWith(fontSize: 16);
-  static TextStyle body2 = light.copyWith(fontSize: 14);
-  static TextStyle caption = regular.copyWith(fontSize: 12);
-} 
+  // Button & Label Styles
+  static const TextStyle buttonText = TextStyle(
+    fontFamily: 'AppleSDGothicNeo',
+    fontSize: 16,
+    fontWeight: FontWeight.w600,
+    letterSpacing: -0.3,
+  );
+
+  static const TextStyle label = TextStyle(
+    fontFamily: 'AppleSDGothicNeo',
+    fontSize: 12,
+    fontWeight: FontWeight.w500,
+    letterSpacing: -0.2,
+  );
+}
