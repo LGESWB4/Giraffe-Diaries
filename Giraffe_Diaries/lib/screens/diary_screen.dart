@@ -6,7 +6,7 @@ import 'chat_dialog.dart';
 
 class DiaryScreen extends StatelessWidget {
   final String generatedImageUrl;
-  final String diaryContent = "오늘도 chill 하게 살아간다";
+  final String contenttext;
   final List<String> hashtags = ['멋짐', '자신감'];
   final String emojiImage = 'assets/emoji_images/cool_emoji.jpg';
   final DateTime selectedDate;
@@ -15,6 +15,7 @@ class DiaryScreen extends StatelessWidget {
     Key? key,
     required this.generatedImageUrl,
     required this.selectedDate,
+    required this.contenttext,
   }) : super(key: key);
 
   void _showImageDetail(BuildContext context) {
@@ -64,6 +65,7 @@ class DiaryScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     
     return Scaffold(
+
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -95,7 +97,7 @@ class DiaryScreen extends StatelessWidget {
               left: 20,
               right: 20,
               top: 20,
-              bottom: 90,
+              bottom: 120,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -164,34 +166,28 @@ class DiaryScreen extends StatelessWidget {
                   child: Container(
                     constraints: const BoxConstraints(maxWidth: 300),
                     child: Text(
-                      diaryContent,
+                      contenttext,
                       textAlign: TextAlign.center,
                       style: AppTextStyles.bodyLarge,
                     ),
                   ),
                 ),
+                const SizedBox(height: 40),
               ],
             ),
           ),
           
           // 기린과 대화하기 버튼
-          Positioned(
-            left: 20,
-            right: 20,
-            bottom: 20,
+          Align(
+            alignment: Alignment.bottomCenter,
             child: Container(
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 10,
-                    offset: const Offset(0, -5),
-                  ),
-                ],
               ),
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
               child: SizedBox(
                 height: 50,
+                width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
                     showModalBottomSheet(

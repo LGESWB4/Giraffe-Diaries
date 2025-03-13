@@ -40,7 +40,7 @@ dependencies:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.8
+  cupertino_icons: ^1.0.2
 
 dev_dependencies:
   flutter_test:
@@ -70,6 +70,7 @@ flutter:
     - assets/emoji_images/
     - assets/loading_images/
     - assets/generate_images/
+    - assets/
     - assets/fonts/
     - assets/images/
 
@@ -79,25 +80,28 @@ flutter:
   # For details regarding adding assets from package dependencies, see
   # https://flutter.dev/to/asset-from-package
 
-  # To add custom fonts to your application, add a fonts section here,
-  # in this "flutter" section. Each entry in this list should have a
-  # "family" key with the font family name, and a "fonts" key with a
-  # list giving the asset and other descriptors for the font. For
-  # example:
   fonts:
-    - family: AppleSDGothicNeoM
+    - family: AppleSDGothicNeo
       fonts:
-        - asset: assets/fonts/AppleSDGothicNeoM.ttf
+        - asset: assets/fonts/AppleSDGothicNeoUL.ttf
+          weight: 100
+        - asset: assets/fonts/AppleSDGothicNeoT.ttf
+          weight: 200
+        - asset: assets/fonts/AppleSDGothicNeoL.ttf
           weight: 300
-        - asset: assets/fonts/AppleSDGothicNeoM.ttf
+        - asset: assets/fonts/AppleSDGothicNeoR.ttf
           weight: 400
         - asset: assets/fonts/AppleSDGothicNeoM.ttf
           weight: 500
-        - asset: assets/fonts/AppleSDGothicNeoM.ttf
+        - asset: assets/fonts/AppleSDGothicNeoSB.ttf
           weight: 600
-        - asset: assets/fonts/AppleSDGothicNeoM.ttf
+        - asset: assets/fonts/AppleSDGothicNeoB.ttf
           weight: 700
-  #
+        - asset: assets/fonts/AppleSDGothicNeoEB.ttf
+          weight: 800
+        - asset: assets/fonts/AppleSDGothicNeoH.ttf
+          weight: 900
+
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
 

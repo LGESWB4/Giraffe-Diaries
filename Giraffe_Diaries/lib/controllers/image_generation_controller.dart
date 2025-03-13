@@ -7,7 +7,7 @@ class ImageGenerationController extends GetxController {
   final RxBool isLoading = false.obs;
   final RxString generatedImageUrl = ''.obs;
 
-  Future<void> generateImage(DateTime selectedDate) async {
+  Future<void> generateImage(DateTime selectedDate, String contenttext) async {
     try {
       isLoading.value = true;
       // TODO: 실제 AI 모델 API 연동
@@ -19,6 +19,7 @@ class ImageGenerationController extends GetxController {
       Get.off(() => DiaryScreen(
         generatedImageUrl: generatedImageUrl.value,
         selectedDate: selectedDate,
+        contenttext: contenttext,
       ));
     } catch (e) {
       Get.snackbar(

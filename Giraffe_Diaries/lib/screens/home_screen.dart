@@ -6,6 +6,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import '../controllers/image_generation_controller.dart';
 import '../screens/image_loading_screen.dart';
 import '../styles/text_styles.dart';
+import '../screens/diary_write_screen.dart';
 
 class HomeScreen extends GetView<CalendarController> {
   const HomeScreen({Key? key}) : super(key: key);
@@ -22,21 +23,8 @@ class HomeScreen extends GetView<CalendarController> {
   );
 
   // 공통 메서드
-  void showDiaryWriteSnackbar(DateTime date) {
-    Get.snackbar(
-      '알림',
-      '${date.month}월 ${date.day}일의 일기를 작성합니다.',
-      snackPosition: SnackPosition.BOTTOM,
-      duration: const Duration(seconds: 1),
-    );
-
-    // 스낵바 표시 후 바로 화면 전환
-    Get.put(ImageGenerationController());
-    Future.delayed(const Duration(milliseconds: 1000), () {
-      Get.to(() => ImageLoadingScreen(
-        selectedDate: date,
-      ));
-    });
+  void showDiaryWriteScreen(DateTime date) {
+    Get.to(() => DiaryWriteScreen(selectedDate: date));
   }
 
   Widget buildDateContainer({
@@ -80,11 +68,16 @@ class HomeScreen extends GetView<CalendarController> {
                           return Container(
                             height: 300,
                             padding: const EdgeInsets.all(20),
+                            color: Colors.white,  // 바텀시트 배경색을 흰색으로 설정
                             child: Column(
                               children: [
                                 Text(
                                   '${controller.focusedDay.value.year}년',
-                                  style: AppTextStyles.heading3,
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: customOrange,
+                                  ),
                                 ),
                                 const SizedBox(height: 20),
                                 Expanded(
@@ -143,7 +136,10 @@ class HomeScreen extends GetView<CalendarController> {
                       children: [
                         Text(
                           '${controller.focusedDay.value.year}년 ${controller.focusedDay.value.month}월',
-                          style: AppTextStyles.heading3,
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         const SizedBox(width: 4),
                         const Icon(
@@ -224,15 +220,15 @@ class HomeScreen extends GetView<CalendarController> {
                       return InkWell(
                         onTap: () {
                           controller.onDaySelected(date, date);
-                          showDiaryWriteSnackbar(date);
+                          showDiaryWriteScreen(date);
                         },
                         child: Container(
                           width: 35,
                           height: 35,
                           margin: const EdgeInsets.only(top: 12),
-                          decoration: const BoxDecoration(
+                          decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color:  Color(0xFFFFF6EC),
+                            color: const Color(0xFFFFF6EC),
                           ),
                           child: const Icon(
                             Icons.add,
@@ -246,15 +242,15 @@ class HomeScreen extends GetView<CalendarController> {
                     return InkWell(
                       onTap: () {
                         controller.onDaySelected(date, date);
-                        showDiaryWriteSnackbar(date);
+                        showDiaryWriteScreen(date);
                       },
                       child: Container(
                         width: 35,
                         height: 35,
                         margin: const EdgeInsets.only(top: 12),
-                        decoration: const BoxDecoration(
+                        decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Color(0xFFE5E5E5),
+                          color: controller.getMarkerColor('default|${controller.events[date]?.first.split('|')[1]}'),
                         ),
                       ),
                     );
@@ -274,18 +270,12 @@ class HomeScreen extends GetView<CalendarController> {
                     if (day.weekday == DateTime.saturday) {
                       customText = Text(
                         '${day.day}',
-                        style: AppTextStyles.bodyLarge.copyWith(
-                          color: customBlue,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: const TextStyle(color: customBlue),
                       );
                     } else if (day.weekday == DateTime.sunday) {
                       customText = Text(
                         '${day.day}',
-                        style: AppTextStyles.bodyLarge.copyWith(
-                          color: customOrange,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: const TextStyle(color: customOrange),
                       );
                     } else {
                       customText = Text('${day.day}');
@@ -310,7 +300,7 @@ class HomeScreen extends GetView<CalendarController> {
                       return Center(
                         child: Text(
                           '일',
-                          style: AppTextStyles.bodyLarge.copyWith(
+                          style: const TextStyle(
                             color: customOrange,
                             fontWeight: FontWeight.bold,
                           ),
@@ -321,7 +311,7 @@ class HomeScreen extends GetView<CalendarController> {
                       return Center(
                         child: Text(
                           '토',
-                          style: AppTextStyles.bodyLarge.copyWith(
+                          style: const TextStyle(
                             color: customBlue,
                             fontWeight: FontWeight.bold,
                           ),
@@ -337,7 +327,7 @@ class HomeScreen extends GetView<CalendarController> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => showDiaryWriteSnackbar(controller.selectedDay.value),
+        onPressed: () => showDiaryWriteScreen(controller.selectedDay.value),
         backgroundColor: const Color(0xFFF6AD62),
         child: const Icon(Icons.add),
       ),
