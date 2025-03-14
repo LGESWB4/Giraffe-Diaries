@@ -3,6 +3,10 @@ from fastapi.responses import FileResponse
 from dto.requests.ImageRequest import ImageRequest
 from dto import ImageDto
 from services.image import generate_diary_image
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 image_router = APIRouter(prefix="/image")
 
@@ -26,4 +30,5 @@ async def generate_image(request: ImageRequest):
 
 @image_router.get("/{image_path}")
 async def loadImage(image_path: str):
-    return FileResponse(f'./images/{image_path}.png')
+    BASE_IMAGE_PATH = os.getenv("BASE_IMAGE_PATH")
+    return FileResponse(BASE_IMAGE_PATH+f'{image_path}')
