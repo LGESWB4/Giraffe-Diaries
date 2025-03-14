@@ -31,3 +31,11 @@ google-services.json
 
 # Android Profiling
 *.hprof
+
+# model
+tokens.txt
+llama.cpp/
+weights/
+model/llama/llama3.2_bundle
+model/SD/output
+__pycache__

@@ -1,0 +1,49 @@
+### git 설치
+sudo apt install git-all
+
+
+### miniconda 설치
+mkdir -p ~/miniconda3
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda3/miniconda.sh
+bash ~/miniconda3/miniconda.sh -b -u -p ~/miniconda3
+rm ~/miniconda3/miniconda.sh
+
+source ~/miniconda3/bin/activate
+conda init --all
+
+
+### OpenGL lib.
+sudo apt update
+sudo apt install -y libgl1
+
+
+### llama.cpp
+
+1. cmake build
+sudo apt update
+sudo apt install -y cmake
+
+2. 빌드 디렉토리 생성
+git clone https://github.com/ggerganov/llama.cpp.git
+cd llama.cpp
+mkdir build
+cd build
+
+3. CMake 실행 (CPU 기반 빌드)
+cmake ..
+cmake --build . --parallel
+(빌드 테스트) ./bin/main --help
+
+
+### cpu/memory 사용량 분석
+htop : cpu
+free -h : memory
+df : disk
+
+du -sh <folder> : 폴더 용량 확인
+ls -lh <file> : 파일 용량 확인
+
+
+
+### nvidia-driver 설정
+https://cloud.google.com/compute/docs/gpus/install-drivers-gpu?hl=ko#ubuntu-pro-and-lts
