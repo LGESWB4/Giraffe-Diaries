@@ -1,7 +1,6 @@
 from fastapi import FastAPI
-from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
-from api import image_router
+from api import image_router, model_router
 
 app = FastAPI()
 
@@ -14,3 +13,4 @@ app.add_middleware(
 )
 
 app.include_router(image_router)
+app.include_router(model_router)
