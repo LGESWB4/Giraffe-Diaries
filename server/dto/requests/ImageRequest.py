@@ -3,7 +3,9 @@ from typing import List
 
 class ImageRequest(BaseModel):
     username: str
-    tokens: List[str]
+    input_word: str
+    style_word: str
+    emotion_query: str
     month: str
     date: str
     style: str
