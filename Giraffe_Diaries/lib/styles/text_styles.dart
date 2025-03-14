@@ -23,6 +23,12 @@ class AppTextStyles {
     letterSpacing: -0.5,
   );
 
+  static const TextStyle bodybold = TextStyle(
+    fontFamily: 'AppleSDGothicNeo',
+    fontSize: 14,
+    fontWeight: FontWeight.bold,
+    letterSpacing: -0.3,
+  );
   // Body Styles
   static const TextStyle bodyLarge = TextStyle(
     fontFamily: 'AppleSDGothicNeo',

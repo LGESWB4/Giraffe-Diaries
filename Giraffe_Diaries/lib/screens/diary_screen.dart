@@ -15,6 +15,7 @@ class DiaryScreen extends StatelessWidget {
     Key? key,
     required this.generatedImageUrl,
     required this.selectedDate,
+
     required this.contenttext,
   }) : super(key: key);
 

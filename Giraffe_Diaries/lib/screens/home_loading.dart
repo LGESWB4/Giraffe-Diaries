@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:giraffe_diaries/controllers/auth_controller.dart';
 import 'dart:async';
 import '../styles/text_styles.dart';
+import '../models/user_model.dart';
 
 class HomeLoadingScreen extends StatefulWidget {
   const HomeLoadingScreen({super.key});
@@ -14,6 +15,9 @@ class HomeLoadingScreen extends StatefulWidget {
 class _HomeLoadingScreenState extends State<HomeLoadingScreen> {
   int _currentImageIndex = 1;
   late Timer _imageTimer;
+  double _downloadProgress = 0.0;
+  bool _isDownloading = false;
+  String _statusMessage = "모델 파일 확인 중...";
 
   @override
   void initState() {
@@ -25,11 +29,35 @@ class _HomeLoadingScreenState extends State<HomeLoadingScreen> {
       });
     });
 
-    // 3초 후 로그인 상태 확인
-    Future.delayed(const Duration(seconds: 3), () {
+    // 모델 다운로드 시작
+    _checkAndDownloadModel();
+  }
+
+  Future<void> _checkAndDownloadModel() async {
+    try {
+      setState(() {
+        _statusMessage = "모델 파일 확인 중...";
+        _isDownloading = true;
+      });
+
+      final modelPath = await downloadModelFile(
+        onProgress: (progress) {
+          setState(() {
+            _downloadProgress = progress;
+            _statusMessage = "모델 다운로드 중...";
+          });
+        },
+      );
+      
+      // 다운로드 완료 후 로그인 상태 확인
       _imageTimer.cancel();
       Get.put(AuthController());
-    });
+    } catch (e) {
+      setState(() {
+        _statusMessage = "오류가 발생했습니다: $e";
+        _isDownloading = false;
+      });
+    }
   }
 
   @override
@@ -55,6 +83,46 @@ class _HomeLoadingScreenState extends State<HomeLoadingScreen> {
             const Text(
               '네가그린기린일기',
               style: AppTextStyles.heading2,
+            ),
+            SizedBox(
+              width: 200,
+              child: Column(
+                children: [
+                  const SizedBox(height: 20),
+                  if (_isDownloading) ...[
+                    LinearProgressIndicator(
+                      value: _downloadProgress,
+                      backgroundColor: Colors.grey[200],
+                      valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFFF6AD62)),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      _statusMessage,
+                      style: AppTextStyles.bodybold,
+                      textAlign: TextAlign.center,
+                    ),
+                    Text(
+                      '${(_downloadProgress * 100).toStringAsFixed(1)}%',
+                      style: AppTextStyles.bodySmall,
+                    ),
+                  ],
+                  if (!_isDownloading) ...[
+                    const SizedBox(height: 5),
+                    SizedBox(
+                      width: 120,
+                      child: ElevatedButton(
+                        onPressed: _checkAndDownloadModel,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFF6AD62),
+                          foregroundColor: Colors.white,
+                          minimumSize: const Size(double.infinity, 40),
+                        ),
+                        child: const Text('다시 시도', style: AppTextStyles.bodybold,),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
             ),
           ],
         ),
