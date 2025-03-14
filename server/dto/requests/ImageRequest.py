@@ -6,3 +6,4 @@ class ImageRequest(BaseModel):
     tokens: List[str]
     month: str
     date: str
+    style: str

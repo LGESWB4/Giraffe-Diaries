@@ -13,7 +13,8 @@ async def generate_image(request: ImageRequest):
         username=request.username,
         tokens=request.tokens,
         month=request.month,
-        date=request.date
+        date=request.date,
+        style=request.style
     )
     image_path = generate_diary_image(image_dto)
     
