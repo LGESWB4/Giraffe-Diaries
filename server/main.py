@@ -1,7 +1,6 @@
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
-from services.gpt import translate_to_english
 from api import image_router
 
 app = FastAPI()
