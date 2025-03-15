@@ -2,15 +2,30 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'screens/home_loading.dart';
+import 'screens/home_screen.dart';
+import 'services/diary_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
-  // 기본 스플래시 화면 숨기기
+
+  // 상태바 설정
   SystemChrome.setEnabledSystemUIMode(
     SystemUiMode.manual,
-    overlays: [],
+    overlays: [SystemUiOverlay.top],
   );
+
+  // 시스템 UI 설정
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+    statusBarIconBrightness: Brightness.dark,
+    systemNavigationBarColor: Colors.white,
+    systemNavigationBarIconBrightness: Brightness.dark,
+  ));
+
+  // Initialize DiaryService
+  final diaryService = await DiaryService().init();
+  Get.put(diaryService);
+
   // GetX 컨트롤러 초기화
   runApp(const MyApp());
 }
@@ -34,7 +49,8 @@ class MyApp extends StatelessWidget {
           bodyMedium: TextStyle(fontWeight: FontWeight.w300),
         ),
       ),
-      home: const HomeLoadingScreen(),
+      // home: const HomeLoadingScreen(),
+      home: const HomeScreen(),
     );
   }
 }

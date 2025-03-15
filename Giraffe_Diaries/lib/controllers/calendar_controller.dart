@@ -1,51 +1,39 @@
 import 'package:get/get.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:flutter/material.dart';
-import 'dart:math';
+import '../services/diary_service.dart';
 
 class CalendarController extends GetxController {
   final selectedDay = DateTime.now().obs;
   final focusedDay = DateTime.now().obs;
   final events = RxMap<DateTime, List<String>>({});
+  final isLoading = false.obs;
+  final DiaryService _diaryService = Get.find<DiaryService>();
 
   static const Color defaultMarkerColor = Color(0xFFE5E5E5);  // 과거 날짜 마커 색상
   static const Color futureMarkerColor = Color(0xFFFAFAFA);  // 미래 날짜 마커 색상
 
-  void _addDefaultEvents() {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final firstDay = DateTime(now.year, now.month, 1);
-    final lastDay = DateTime(now.year, now.month + 1, 0);
-
-    for (var d = firstDay; d.isBefore(lastDay.add(const Duration(days: 1))); d = d.add(const Duration(days: 1))) {
-      final currentDate = DateTime(d.year, d.month, d.day);
-      final color = currentDate.isBefore(today) || currentDate.isAtSameMomentAs(today)
-          ? defaultMarkerColor
-          : futureMarkerColor;
-      events[DateTime.utc(d.year, d.month, d.day)] = ['default|${color.value}'];
-    }
-  }
-
-  void updateEventsForMonth(DateTime month) {
-    events.clear();
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final firstDay = DateTime(month.year, month.month, 1);
-    final lastDay = DateTime(month.year, month.month + 1, 0);
-
-    for (var d = firstDay; d.isBefore(lastDay.add(const Duration(days: 1))); d = d.add(const Duration(days: 1))) {
-      final currentDate = DateTime(d.year, d.month, d.day);
-      final color = currentDate.isBefore(today) || currentDate.isAtSameMomentAs(today)
-          ? defaultMarkerColor
-          : futureMarkerColor;
-      events[DateTime.utc(d.year, d.month, d.day)] = ['default|${color.value}'];
-    }
-  }
-
   @override
   void onInit() {
     super.onInit();
-    _addDefaultEvents();
+    updateEventsForMonth(focusedDay.value);
+  }
+
+  Future<void> updateEventsForMonth(DateTime month) async {
+    isLoading.value = true;
+    events.clear();
+    
+    // 해당 월의 일기 데이터 로드
+    final entries = _diaryService.getEntriesForMonth(month);
+    for (var entry in entries) {
+      final date = DateTime(entry.date.year, entry.date.month, entry.date.day);
+      events[date] = ['diary'];
+    }
+    
+    // 로딩 효과를 위해 약간의 지연 추가
+    await Future.delayed(const Duration(milliseconds: 300));
+    
+    isLoading.value = false;
   }
 
   void onDaySelected(DateTime selected, DateTime focused) {
@@ -53,6 +41,11 @@ class CalendarController extends GetxController {
       selectedDay.value = selected;
       focusedDay.value = focused;
     }
+  }
+
+  void onPageChanged(DateTime focusedDay) {
+    this.focusedDay.value = focusedDay;
+    updateEventsForMonth(focusedDay);
   }
 
   Color getMarkerColor(String eventStr) {
