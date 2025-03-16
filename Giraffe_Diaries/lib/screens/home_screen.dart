@@ -51,6 +51,32 @@ class HomeScreen extends GetView<CalendarController> {
     );
   }
 
+  // 날짜 선택 시 처리하는 메서드 추가
+  void onDayTapped(DateTime selectedDate) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    
+    // 미래 날짜는 선택 불가
+    if (selectedDate.isAfter(today)) {
+      return;
+    }
+
+    // 오늘 날짜면 일기 작성 화면으로
+    if (isSameDay(selectedDate, today)) {
+      showDiaryWriteScreen(selectedDate);
+      return;
+    }
+
+    // 과거 날짜의 경우 일기가 있으면 보기 화면으로
+    final diaryEntry = Get.find<DiaryService>().getDiaryEntry(selectedDate);
+    if (diaryEntry != null) {
+      // 일기 보기 화면으로 이동
+      // Get.to(() => DiaryViewScreen(diaryEntry: diaryEntry));
+    } else{
+      showDiaryWriteScreen(selectedDate);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     // Initialize controller
@@ -103,7 +129,10 @@ class HomeScreen extends GetView<CalendarController> {
                     locale: 'ko_KR',
                     selectedDayPredicate: (day) =>
                         isSameDay(controller.selectedDay.value, day),
-                    onDaySelected: controller.onDaySelected,
+                    onDaySelected: (selectedDay, focusedDay) {
+                      controller.onDaySelected(selectedDay, focusedDay);
+                      onDayTapped(selectedDay);
+                    },
                     calendarFormat: CalendarFormat.month,
                     pageAnimationEnabled: true,
                     pageAnimationDuration: const Duration(milliseconds: 300),

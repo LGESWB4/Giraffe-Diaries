@@ -51,4 +51,28 @@ class DiaryService extends GetxService {
       entry.date.year == month.year && entry.date.month == month.month
     ).toList();
   }
+
+  void printAllDiaries() {
+    print('=== 저장된 모든 일기 ===');
+    _entries.values.forEach((diary) {
+      print('날짜: ${diary.date}');
+      print('내용: ${diary.content}');
+      print('감정: ${diary.emotion}');
+      print('선택된 스타일: ${diary.style}');
+      print('------------------------');
+    });
+  }
+
+  void printDiaryForDate(DateTime date) {
+    final key = _getKey(date);
+    final diary = _entries[key];
+    if (diary != null) {
+      print('=== ${date} 일기 ===');
+      print('내용: ${diary.content}');
+      print('감정: ${diary.emotion}');
+      print('선택된 스타일: ${diary.style}');
+    } else {
+      print('${date}에 저장된 일기가 없습니다.');
+    }
+  }
 }

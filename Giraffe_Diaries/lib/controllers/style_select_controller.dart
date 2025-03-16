@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../screens/image_loading_screen.dart';
 import '../controllers/image_generation_controller.dart';
 import '../widgets/exit_confirmation_dialog.dart';
+import '../models/diary_entry.dart';
+import '../services/diary_service.dart';
 
 class StyleSelectController extends GetxController {
   final RxInt selectedStyle = (-1).obs;  // -1은 선택되지 않은 상태
@@ -30,15 +32,35 @@ class StyleSelectController extends GetxController {
   }
 
   void skipSelection() { // TODO : 그림 일기로 이동
-    Get.back();  // 또는 다음 화면으로 이동하는 로직
+    onStyleSelected(styles[selectedStyle.value]['name']!);
+    Get.to(() => ImageLoadingScreen(selectedDate: selectedDate, contenttext: contenttext)); // 또는 다음 화면으로 이동하는 로직
   }
 
   void confirmSelection() {
     if (selectedStyle.value >= 0) {
+      onStyleSelected(styles[selectedStyle.value]['name']!);
       // TODO: 선택된 스타일 저장 로직
       Get.put(ImageGenerationController());
       Future.delayed(const Duration(seconds: 10));
       Get.to(() => ImageLoadingScreen(selectedDate: selectedDate, contenttext: contenttext));  // 또는 다음 화면으로 이동하는 로직
     }
+  }
+
+  void onStyleSelected(String style) async {
+    final diaryService = Get.find<DiaryService>();
+
+    final entry = DiaryEntry(
+      date: selectedDate,
+      content: contenttext,
+      style: style,
+      emotion: "",
+      imageUrl: "",
+      hashtags: [],
+    );
+
+    await diaryService.saveDiaryEntry(entry);
+
+    // 저장 후 바로 확인
+    diaryService.printDiaryForDate(selectedDate);
   }
 }

@@ -5,12 +5,16 @@ class DiaryEntry {
   final String content;
   final String emotion;
   final List<String> hashtags;
+  final String imageUrl;
+  final String style;
 
   DiaryEntry({
     required this.date,
     required this.content,
     required this.emotion,
     required this.hashtags,
+    required this.imageUrl,
+    required this.style,
   });
 
   factory DiaryEntry.fromJson(Map<String, dynamic> json) {
@@ -19,6 +23,8 @@ class DiaryEntry {
       content: json['content'],
       emotion: json['emotion'],
       hashtags: List<String>.from(json['hashtags']),
+      imageUrl: json['imageUrl'],
+      style: json['style'],
     );
   }
 
@@ -28,6 +34,8 @@ class DiaryEntry {
       'content': content,
       'emotion': emotion,
       'hashtags': hashtags,
+      'imageUrl': imageUrl,
+      'style': style,
     };
   }
 }
