@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../services/api_service.dart';
 import '../screens/diary_screen.dart';
 import '../services/diary_service.dart';
@@ -12,6 +13,10 @@ class ImageGenerationController extends GetxController {
     try {
       isLoading.value = true;
 
+      // 사용자 이름 가져오기
+      final prefs = await SharedPreferences.getInstance();
+      final nickname = prefs.getString('nickname') ?? '김덕륜';
+
       // 날짜 포맷팅
       final month = selectedDate.month.toString().padLeft(2, '0');
       final date = selectedDate.day.toString().padLeft(2, '0');
@@ -21,11 +26,11 @@ class ImageGenerationController extends GetxController {
 
       // API 호출하여 이미지 생성 (임시) TODO: 추후 변수로 대체
       final imagePath = await ApiService.generateImage(
-        username: "김덕륜", // 실제 사용자 이름으로 대체 필요
-        inputWord: "김덕륜, 아름답다, 산책, 들판",
-        month: "03",
-        date: "07",
-        styleWord: "수채화",
+        nickname: nickname, // 실제 사용자 이름으로 대체 필요
+        inputWord: keywords,
+        month: month,
+        date: date,
+        styleWord: selectedStyle,
         emotionQuery: "뿌듯함", // 실제 감정으로 대체 필요
       );
       print("imagePath: ${imagePath}");
@@ -39,6 +44,7 @@ class ImageGenerationController extends GetxController {
       final existingEntry = diaryService.getDiaryEntry(selectedDate);
       if (existingEntry != null) {
         final updatedEntry = DiaryEntry(
+          nickname: nickname,
           date: existingEntry.date,
           content: existingEntry.content,
           style: existingEntry.style,

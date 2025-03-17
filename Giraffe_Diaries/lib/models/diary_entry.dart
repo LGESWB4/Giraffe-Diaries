@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class DiaryEntry {
+  final String nickname;
   final DateTime date;
   final String content;
   final String emotion;
@@ -9,6 +10,7 @@ class DiaryEntry {
   final String style;
 
   DiaryEntry({
+    required this.nickname,
     required this.date,
     required this.content,
     required this.emotion,
@@ -19,6 +21,7 @@ class DiaryEntry {
 
   factory DiaryEntry.fromJson(Map<String, dynamic> json) {
     return DiaryEntry(
+      nickname: json['nickname'],
       date: DateTime.parse(json['date']),
       content: json['content'],
       emotion: json['emotion'],
@@ -30,6 +33,7 @@ class DiaryEntry {
 
   Map<String, dynamic> toJson() {
     return {
+      'nickname' : nickname,
       'date': date.toIso8601String(),
       'content': content,
       'emotion': emotion,

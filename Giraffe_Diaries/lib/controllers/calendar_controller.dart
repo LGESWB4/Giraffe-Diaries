@@ -22,17 +22,17 @@ class CalendarController extends GetxController {
   Future<void> updateEventsForMonth(DateTime month) async {
     isLoading.value = true;
     events.clear();
-    
+
     // 해당 월의 일기 데이터 로드
     final entries = _diaryService.getEntriesForMonth(month);
     for (var entry in entries) {
       final date = DateTime(entry.date.year, entry.date.month, entry.date.day);
       events[date] = ['diary'];
     }
-    
+
     // 로딩 효과를 위해 약간의 지연 추가
     await Future.delayed(const Duration(milliseconds: 300));
-    
+
     isLoading.value = false;
   }
 

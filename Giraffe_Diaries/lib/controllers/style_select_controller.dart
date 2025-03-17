@@ -42,6 +42,7 @@ class StyleSelectController extends GetxController {
     final diaryService = Get.find<DiaryService>();
 
     final entry = DiaryEntry(
+      nickname: nickname,
       date: selectedDate,
       content: contenttext,
       style: style,
