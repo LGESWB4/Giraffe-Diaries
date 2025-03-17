@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-// import 'screens/home_loading.dart';
-import 'screens/home_screen.dart';
+import 'screens/home_loading.dart';
 import 'services/diary_service.dart';
 
 void main() async {
@@ -49,8 +48,7 @@ class MyApp extends StatelessWidget {
           bodyMedium: TextStyle(fontWeight: FontWeight.w300),
         ),
       ),
-      // home: const HomeLoadingScreen(),
-      home: const HomeScreen(),
+      home: const HomeLoadingScreen(),
     );
   }
 }
