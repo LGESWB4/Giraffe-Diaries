@@ -1,13 +1,9 @@
 import 'dart:io';
-import 'dart:convert';  // utf8을 위해 추가
 import 'package:llama_cpp_dart/llama_cpp_dart.dart';
 import 'package:llama_cpp_dart/src/llama.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/material.dart'; 
 import 'dart:ffi';
-import 'package:ffi/ffi.dart';  // Utf8 타입을 위해 추가
-import 'package:process_run/shell.dart';
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:system_info2/system_info2.dart';
 
@@ -53,7 +49,7 @@ Future<void> runllama() async {
   // 모델 파일 경로와 라이브러리 경로 설정
 
   final cores = SysInfo.cores;
-  int memory = SysInfo.getTotalVirtualMemory() ~/ megaByte;
+  //int memory = SysInfo.getTotalVirtualMemory() ~/ megaByte;
 
   Llama.libraryPath = "libllama.so";
 

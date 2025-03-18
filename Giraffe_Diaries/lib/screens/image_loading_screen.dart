@@ -7,13 +7,13 @@ import '../styles/text_styles.dart';
 class ImageLoadingScreen extends StatefulWidget {
   final DateTime selectedDate;
   final String contenttext;
-  final String style;
+  final String selectedStyle;
 
   const ImageLoadingScreen({
     Key? key,
     required this.selectedDate,
     required this.contenttext,
-    required this.style,
+    required this.selectedStyle,
   }) : super(key: key);
 
   @override
@@ -51,7 +51,7 @@ class _ImageLoadingScreenState extends State<ImageLoadingScreen> {
     });
 
     // AI 이미지 생성 시작
-    _controller.generateImage(widget.selectedDate, widget.contenttext, widget.style);
+    _controller.generateImage(widget.selectedDate, widget.contenttext, widget.selectedStyle);
   }
 
   @override
@@ -83,4 +83,4 @@ class _ImageLoadingScreenState extends State<ImageLoadingScreen> {
       ),
     );
   }
-} 
+}

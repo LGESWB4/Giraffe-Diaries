@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'dart:math';
 import '../styles/text_styles.dart';
 import 'chat_dialog.dart';
 
@@ -49,7 +48,7 @@ class DiaryScreen extends StatelessWidget {
                 child: InteractiveViewer(
                   minScale: 0.5,
                   maxScale: 4.0,
-                  child: Image.asset(
+                  child: Image.network(
                     generatedImageUrl,
                     fit: BoxFit.contain,
                   ),
@@ -152,7 +151,7 @@ class DiaryScreen extends StatelessWidget {
                       onTap: () => _showImageDetail(context),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(15),
-                        child: Image.asset(
+                        child: Image.network(
                           generatedImageUrl,
                           fit: BoxFit.cover,
                         ),

@@ -5,7 +5,7 @@ import '../screens/home_screen.dart';
 
 class AuthController extends GetxController {
   final RxBool isLoggedIn = false.obs;
-  final RxString nickname = ''.obs;
+  final RxString userName = ''.obs;
   SharedPreferences? _prefs;
 
   @override
@@ -22,13 +22,13 @@ class AuthController extends GetxController {
   Future<void> checkLoginStatus() async {
     _prefs ??= await SharedPreferences.getInstance();
 
-    var savedNickname = _prefs?.getString('nickname') ?? '';
+    var savedusername = _prefs?.getString('username') ?? '';
 
     // savedNickname 값 "" 로 초기화
-    savedNickname = "";
+    savedusername = "";
 
-    if (savedNickname.isNotEmpty) {
-      nickname.value = savedNickname;
+    if (savedusername.isNotEmpty) {
+      userName.value = savedusername;
       isLoggedIn.value = true;
       Get.offAll(() => const HomeScreen(), transition: Transition.fadeIn);
     } else {
@@ -37,9 +37,9 @@ class AuthController extends GetxController {
     }
   }
 
-  Future<void> login(String userNickname) async {
+  Future<void> login(String username) async {
 
-    if (userNickname.trim().isEmpty) {
+    if (username.trim().isEmpty) {
       Get.snackbar(
         '로그인 실패',
         '닉네임을 입력해주세요.',
@@ -50,8 +50,8 @@ class AuthController extends GetxController {
 
     try {
       _prefs ??= await SharedPreferences.getInstance();
-      await _prefs?.setString('nickname', userNickname);
-      nickname.value = userNickname;
+      await _prefs?.setString('username', username);
+      userName.value = username;
       isLoggedIn.value = true;
       Get.offAll(() => const HomeScreen(), transition: Transition.fadeIn);
     } catch (e) {
@@ -65,8 +65,8 @@ class AuthController extends GetxController {
 
   Future<void> logout() async {
     _prefs ??= await SharedPreferences.getInstance();
-    await _prefs?.remove('nickname');
-    nickname.value = '';
+    await _prefs?.remove('username');
+    userName.value = '';
     isLoggedIn.value = false;
     Get.offAll(() => LoginScreen(), transition: Transition.fadeIn);
   }

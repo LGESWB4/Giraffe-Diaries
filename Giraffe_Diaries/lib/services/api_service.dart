@@ -1,35 +1,44 @@
-import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class ApiService {
-  final String baseUrl;
+  static const String baseUrl = 'http://35.206.251.58:8000';
 
-  ApiService({required this.baseUrl});
+  static Future<String> generateImage({
+    required String username,
+    required String inputWord,
+    required String month,
+    required String date,
+    required String styleWord,
+    required String emotionQuery,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/image/'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'username': username,
+          'input_word': inputWord,
+          'month': month,
+          'date': date,
+          'style_word': styleWord,
+          'emotion_query': emotionQuery,
+        }),
+      );
 
-  Future<Map<String, dynamic>> get(String endpoint) async {
-    final response = await http.get(Uri.parse('$baseUrl$endpoint'));
-
-    if (response.statusCode == 200) {
-      return json.decode(response.body);
-    } else {
-      throw Exception('Failed to load data');
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        print("data: ${data}");
+        return data['image_path'];
+      } else {
+        throw Exception('Failed to generate image');
+      }
+    } catch (e) {
+      throw Exception('Error generating image: $e');
     }
   }
 
-  Future<Map<String, dynamic>> post(
-    String endpoint,
-    Map<String, dynamic> body,
-  ) async {
-    final response = await http.post(
-      Uri.parse('$baseUrl$endpoint'),
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode(body),
-    );
-
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      return json.decode(response.body);
-    } else {
-      throw Exception('Failed to create data');
-    }
+  static String getImageUrl(String imagePath) {
+    return '$baseUrl/image/$imagePath';
   }
 }
