@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../controllers/image_generation_controller.dart';
+import '../controllers/image_loading_controller.dart';
 import 'dart:async';
 import '../styles/text_styles.dart';
 
 class ImageLoadingScreen extends StatefulWidget {
   final DateTime selectedDate;
   final String contenttext;
-  
+  final String style;
+
   const ImageLoadingScreen({
     Key? key,
     required this.selectedDate,
     required this.contenttext,
+    required this.style,
   }) : super(key: key);
 
   @override
@@ -23,9 +25,9 @@ class _ImageLoadingScreenState extends State<ImageLoadingScreen> {
   int _currentImageIndex = 1;
   late Timer _imageTimer;
   final List<String> _loadingTexts = [
-    'AI가 그림을 그리고 있어요',
-    '멋진 그림을 그리는 중이에요',
-    '조금만 더 기다려주세요',
+    'AI가 그림을 그리고 있어요...',
+    '멋진 그림을 그리는 중이에요...',
+    '조금만 더 기다려주세요...',
   ];
   int _currentTextIndex = 0;
 
@@ -49,7 +51,7 @@ class _ImageLoadingScreenState extends State<ImageLoadingScreen> {
     });
 
     // AI 이미지 생성 시작
-    _controller.generateImage(widget.selectedDate, widget.contenttext);
+    _controller.generateImage(widget.selectedDate, widget.contenttext, widget.style);
   }
 
   @override

@@ -3,7 +3,8 @@ import 'package:get/get.dart';
 import 'package:giraffe_diaries/controllers/auth_controller.dart';
 import 'dart:async';
 import '../styles/text_styles.dart';
-import '../models/user_model.dart';
+import '../models/model_download.dart';
+import '../models/model_load.dart';
 
 class HomeLoadingScreen extends StatefulWidget {
   const HomeLoadingScreen({super.key});
@@ -23,6 +24,8 @@ class _HomeLoadingScreenState extends State<HomeLoadingScreen> {
   void initState() {
     super.initState();
     // 이미지 애니메이션 시작
+
+    
     _imageTimer = Timer.periodic(const Duration(milliseconds: 200), (timer) {
       setState(() {
         _currentImageIndex = _currentImageIndex == 2 ? 1 : _currentImageIndex + 1;
@@ -31,6 +34,8 @@ class _HomeLoadingScreenState extends State<HomeLoadingScreen> {
 
     // 모델 다운로드 시작
     _checkAndDownloadModel();
+    //testllama();
+
   }
 
   Future<void> _checkAndDownloadModel() async {
@@ -54,7 +59,8 @@ class _HomeLoadingScreenState extends State<HomeLoadingScreen> {
       Get.put(AuthController());
     } catch (e) {
       setState(() {
-        _statusMessage = "오류가 발생했습니다: $e";
+        _statusMessage = "오류가 발생했습니다!";
+        print("$_statusMessage: $e");
         _isDownloading = false;
       });
     }
@@ -108,6 +114,12 @@ class _HomeLoadingScreenState extends State<HomeLoadingScreen> {
                   ],
                   if (!_isDownloading) ...[
                     const SizedBox(height: 5),
+                    Text(
+                      _statusMessage,
+                      style: AppTextStyles.bodybold,
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 10),
                     SizedBox(
                       width: 120,
                       child: ElevatedButton(

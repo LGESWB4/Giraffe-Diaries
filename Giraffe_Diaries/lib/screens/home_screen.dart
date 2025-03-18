@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../controllers/calendar_controller.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import '../controllers/image_generation_controller.dart';
+import '../controllers/image_loading_controller.dart';
 import '../screens/image_loading_screen.dart';
 import '../styles/text_styles.dart';
 import '../screens/diary_write_screen.dart';

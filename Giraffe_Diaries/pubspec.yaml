@@ -38,14 +38,19 @@ dependencies:
   table_calendar: ^3.0.9
   intl: ^0.19.0
   path_provider: ^2.1.2
-  firebase_storage: ^11.6.0
-  firebase_core: ^2.24.2
+  firebase_storage: ^12.4.4
+  firebase_core: ^3.12.1
+  process_run: ^0.13.2
+  device_info_plus: ^9.1.2
+  system_info2: ^4.0.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
-  llama_cpp_dart: ^0.0.8
   ffi: ^2.1.4
+  firebase_app_check: ^0.3.2+4
+  permission_handler: ^11.4.0
+  llama_cpp_dart: ^0.0.8
 
 dev_dependencies:
   flutter_test:
@@ -77,6 +82,7 @@ flutter:
     - assets/generate_images/
     - assets/fonts/
     - assets/images/
+    - assets/model/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import '../screens/image_loading_screen.dart';
-import '../controllers/image_generation_controller.dart';
+import '../controllers/image_loading_controller.dart';
 import '../widgets/exit_confirmation_dialog.dart';
 
 class StyleSelectController extends GetxController {
@@ -38,7 +38,7 @@ class StyleSelectController extends GetxController {
       // TODO: 선택된 스타일 저장 로직
       Get.put(ImageGenerationController());
       Future.delayed(const Duration(seconds: 10));
-      Get.to(() => ImageLoadingScreen(selectedDate: selectedDate, contenttext: contenttext));  // 또는 다음 화면으로 이동하는 로직
+      Get.to(() => ImageLoadingScreen(selectedDate: selectedDate, contenttext: contenttext, style: styles[selectedStyle.value]['name'] ?? ''));  // 또는 다음 화면으로 이동하는 로직
     }
   }
 }

@@ -1,0 +1,32 @@
+{
+    "flutter": {
+      "platforms": {
+        "android": {
+          "default": {
+            "projectId": "giraffe-diaries-287f9",
+            "appId": "1:661230908102:android:33d1ff9243095236de1dc7",
+            "fileOutput": "android/app/google-services.json"
+          }
+        },
+        "dart": {
+          "lib/firebase_options.dart": {
+            "projectId": "giraffe-diaries-287f9",
+            "configurations": {
+              "android": "1:661230908102:android:33d1ff9243095236de1dc7",
+              "ios": "1:661230908102:ios:f293285966698329de1dc7",
+              "macos": "1:661230908102:ios:f293285966698329de1dc7",
+              "web": "1:661230908102:web:c57a68566c910f32de1dc7",
+              "windows": "1:661230908102:web:260bc5a3163dee0ede1dc7"
+            }
+          }
+        }
+      }
+    },
+    "hosting": {
+      "public": "public",
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"]
+    },
+    "storage": {
+      "rules": "storage.rules"
+    }
+  }
