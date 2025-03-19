@@ -6,7 +6,7 @@ import '../models/diary_entry.dart';
 import '../services/diary_service.dart';
 
 class StyleSelectController extends GetxController {
-  final RxInt selectedStyle = (-1).obs;  // -1은 선택되지 않은 상태
+  final RxInt selectedStyle = (-1).obs; // -1은 선택되지 않은 상태
   final DateTime selectedDate;
   final String contenttext;
   late final ImageGenerationController imageGenerationController;
@@ -39,7 +39,7 @@ class StyleSelectController extends GetxController {
   // 스타일 선택 후 임시 저장 (로컬)
   void onStyleSelected(String style) async {
     final diaryService = Get.find<DiaryService>();
-    
+
     final prefs = await SharedPreferences.getInstance();
     final username = prefs.getString('nickname') ?? '김덕륜';
 
@@ -49,7 +49,7 @@ class StyleSelectController extends GetxController {
       content: contenttext,
       style: style,
       emotion: "",
-      imageUrl: "",  // 이미지 URL은 비워둠
+      imageUrl: "", // 이미지 URL은 비워둠
       hashtags: [],
     );
 
@@ -60,7 +60,10 @@ class StyleSelectController extends GetxController {
 
   void skipSelection() {
     onStyleSelected("수채화");
-    Get.to(() => ImageLoadingScreen(selectedDate: selectedDate, contenttext: contenttext, selectedStyle: "수채화")); // 또는 다음 화면으로 이동하는 로직
+    Get.to(() => ImageLoadingScreen(
+        selectedDate: selectedDate,
+        contenttext: contenttext,
+        selectedStyle: "수채화")); // 또는 다음 화면으로 이동하는 로직
   }
 
   void confirmSelection() {
@@ -72,10 +75,9 @@ class StyleSelectController extends GetxController {
 
       // 로딩 화면으로 전환하고 이미지 생성 시작
       Get.to(() => ImageLoadingScreen(
-        selectedDate: selectedDate,
-        contenttext: contenttext,
-        selectedStyle: selectedStyleName
-      ));
+          selectedDate: selectedDate,
+          contenttext: contenttext,
+          selectedStyle: selectedStyleName));
     }
   }
 }

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:giraffe_diaries/controllers/emoji_controller.dart';
+import 'package:giraffe_diaries/screens/diary_screen.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../controllers/calendar_controller.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -17,7 +19,8 @@ class HomeScreen extends GetView<CalendarController> {
   static const Color primaryLightColor = Color(0xFFFFF6EC);
 
   // 공통 스타일 정의
-  static const EdgeInsets datePadding = EdgeInsets.symmetric(horizontal: 8, vertical: 4);
+  static const EdgeInsets datePadding =
+      EdgeInsets.symmetric(horizontal: 8, vertical: 4);
 
   // 공통 메서드
   void showDiaryWriteScreen(DateTime date) {
@@ -53,7 +56,7 @@ class HomeScreen extends GetView<CalendarController> {
   void onDayTapped(DateTime selectedDate) {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    
+
     // 미래 날짜는 선택 불가
     if (selectedDate.isAfter(today)) {
       return;
@@ -69,8 +72,14 @@ class HomeScreen extends GetView<CalendarController> {
     final diaryEntry = Get.find<DiaryService>().getDiaryEntry(selectedDate);
     if (diaryEntry != null) {
       // 일기 보기 화면으로 이동
-      // Get.to(() => DiaryViewScreen(diaryEntry: diaryEntry));
-    } else{
+      String emojiImagePath = getEmojiPath(diaryEntry.emotion);
+      Get.to(() => DiaryScreen(
+            generatedImageUrl: diaryEntry.imageUrl,
+            selectedDate: selectedDate,
+            contenttext: diaryEntry.content,
+            emojiImage: emojiImagePath,
+          ));
+    } else {
       showDiaryWriteScreen(selectedDate);
     }
   }
@@ -94,21 +103,21 @@ class HomeScreen extends GetView<CalendarController> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Obx(() => InkWell(
-                    onTap: () => showMonthPicker(context),
-                    highlightColor: Colors.transparent,
-                    splashColor: Colors.transparent,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          '${controller.focusedDay.value.year}년 ${controller.focusedDay.value.month}월',
-                          style: AppTextStyles.heading3,
+                        onTap: () => showMonthPicker(context),
+                        highlightColor: Colors.transparent,
+                        splashColor: Colors.transparent,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              '${controller.focusedDay.value.year}년 ${controller.focusedDay.value.month}월',
+                              style: AppTextStyles.heading3,
+                            ),
+                            const SizedBox(width: 4),
+                            const Icon(Icons.arrow_drop_down, size: 24),
+                          ],
                         ),
-                        const SizedBox(width: 4),
-                        const Icon(Icons.arrow_drop_down, size: 24),
-                      ],
-                    ),
-                  )),
+                      )),
                   Image.asset(
                     'assets/images/giraffe_logo.png',
                     height: 50,
@@ -119,242 +128,254 @@ class HomeScreen extends GetView<CalendarController> {
             const SizedBox(height: 8),
             Expanded(
               child: Obx(() => Stack(
-                children: [
-                  TableCalendar(
-                    firstDay: DateTime.utc(2021, 1, 1),
-                    lastDay: DateTime.utc(2030, 12, 31),
-                    focusedDay: controller.focusedDay.value,
-                    locale: 'ko_KR',
-                    selectedDayPredicate: (day) =>
-                        isSameDay(controller.selectedDay.value, day),
-                    onDaySelected: (selectedDay, focusedDay) {
-                      controller.onDaySelected(selectedDay, focusedDay);
-                      onDayTapped(selectedDay);
-                    },
-                    calendarFormat: CalendarFormat.month,
-                    pageAnimationEnabled: true,
-                    pageAnimationDuration: const Duration(milliseconds: 300),
-                    pageAnimationCurve: Curves.easeInOut,
-                    startingDayOfWeek: StartingDayOfWeek.sunday,
-                    availableCalendarFormats: const {
-                      CalendarFormat.month: '',
-                    },
-                    onPageChanged: controller.onPageChanged,
-                    calendarStyle: CalendarStyle(
-                      outsideDaysVisible: false,
-                      holidayTextStyle: TextStyle(color: customOrange),
-                      selectedDecoration: BoxDecoration(
-                        color: Colors.transparent,
-                        shape: BoxShape.rectangle,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      selectedTextStyle: AppTextStyles.bodyLarge.copyWith(
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      todayDecoration: BoxDecoration(
-                        color: Colors.transparent,
-                      ),
-                      todayTextStyle: AppTextStyles.bodyLarge.copyWith(
-                        color: primaryColor,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      markersMaxCount: 1,
-                      markerSize: 35,
-                      markerMargin: const EdgeInsets.only(top: 12),
-                      cellMargin: EdgeInsets.zero,
-                      cellPadding: EdgeInsets.zero,
-                    ),
-                    rowHeight: 100,
-                    headerStyle: HeaderStyle(
-                      formatButtonVisible: false,
-                      titleCentered: false,
-                      leftChevronVisible: false,
-                      rightChevronVisible: false,
-                      titleTextStyle: const TextStyle(height: 0, fontSize: 0),
-                      headerPadding: EdgeInsets.zero,
-                      headerMargin: EdgeInsets.zero,
-                      titleTextFormatter: (date, locale) => '',
-                      decoration: const BoxDecoration(
-                        color: Colors.transparent,
-                      ),
-                    ),
-                    daysOfWeekHeight: 24,
-                    daysOfWeekStyle: DaysOfWeekStyle(
-                      dowTextFormatter: (date, locale) {
-                        if (date.weekday == DateTime.sunday) return '일';
-                        if (date.weekday == DateTime.saturday) return '토';
-                        return ['월', '화', '수', '목', '금'][date.weekday - 1];
-                      },
-                      decoration: const BoxDecoration(color: Colors.transparent),
-                      weekdayStyle: AppTextStyles.calendarWeekday,
-                      weekendStyle: AppTextStyles.calendarWeekday,
-                    ),
-                    calendarBuilders: CalendarBuilders(
-                      markerBuilder: (context, date, events) {
-                        // 오늘 날짜
-                        final now = DateTime.now();
-                        final today = DateTime(now.year, now.month, now.day);
-                        final targetDate = DateTime(date.year, date.month, date.day);
+                    children: [
+                      TableCalendar(
+                        firstDay: DateTime.utc(2021, 1, 1),
+                        lastDay: DateTime.utc(2030, 12, 31),
+                        focusedDay: controller.focusedDay.value,
+                        locale: 'ko_KR',
+                        selectedDayPredicate: (day) =>
+                            isSameDay(controller.selectedDay.value, day),
+                        onDaySelected: (selectedDay, focusedDay) {
+                          controller.onDaySelected(selectedDay, focusedDay);
+                          onDayTapped(selectedDay);
+                        },
+                        calendarFormat: CalendarFormat.month,
+                        pageAnimationEnabled: true,
+                        pageAnimationDuration:
+                            const Duration(milliseconds: 300),
+                        pageAnimationCurve: Curves.easeInOut,
+                        startingDayOfWeek: StartingDayOfWeek.sunday,
+                        availableCalendarFormats: const {
+                          CalendarFormat.month: '',
+                        },
+                        onPageChanged: controller.onPageChanged,
+                        calendarStyle: CalendarStyle(
+                          outsideDaysVisible: false,
+                          holidayTextStyle:
+                              const TextStyle(color: customOrange),
+                          selectedDecoration: BoxDecoration(
+                            color: Colors.transparent,
+                            shape: BoxShape.rectangle,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          selectedTextStyle: AppTextStyles.bodyLarge.copyWith(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          todayDecoration: const BoxDecoration(
+                            color: Colors.transparent,
+                          ),
+                          todayTextStyle: AppTextStyles.bodyLarge.copyWith(
+                            color: primaryColor,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          markersMaxCount: 1,
+                          markerSize: 35,
+                          markerMargin: const EdgeInsets.only(top: 12),
+                          cellMargin: EdgeInsets.zero,
+                          cellPadding: EdgeInsets.zero,
+                        ),
+                        rowHeight: 100,
+                        headerStyle: HeaderStyle(
+                          formatButtonVisible: false,
+                          titleCentered: false,
+                          leftChevronVisible: false,
+                          rightChevronVisible: false,
+                          titleTextStyle:
+                              const TextStyle(height: 0, fontSize: 0),
+                          headerPadding: EdgeInsets.zero,
+                          headerMargin: EdgeInsets.zero,
+                          titleTextFormatter: (date, locale) => '',
+                          decoration: const BoxDecoration(
+                            color: Colors.transparent,
+                          ),
+                        ),
+                        daysOfWeekHeight: 24,
+                        daysOfWeekStyle: DaysOfWeekStyle(
+                          dowTextFormatter: (date, locale) {
+                            if (date.weekday == DateTime.sunday) return '일';
+                            if (date.weekday == DateTime.saturday) return '토';
+                            return ['월', '화', '수', '목', '금'][date.weekday - 1];
+                          },
+                          decoration:
+                              const BoxDecoration(color: Colors.transparent),
+                          weekdayStyle: AppTextStyles.calendarWeekday,
+                          weekendStyle: AppTextStyles.calendarWeekday,
+                        ),
+                        calendarBuilders: CalendarBuilders(
+                          markerBuilder: (context, date, events) {
+                            // 오늘 날짜
+                            final now = DateTime.now();
+                            final today =
+                                DateTime(now.year, now.month, now.day);
+                            final targetDate =
+                                DateTime(date.year, date.month, date.day);
 
-                        // 미래 날짜인 경우 클릭 불가능한 마커 표시
-                        if (targetDate.isAfter(today)) {
-                          return Container(
-                            width: 35,
-                            height: 35,
-                            margin: const EdgeInsets.only(top: 12),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: const Color(0xFFF5F5F5),
-                            ),
-                          );
-                        }
+                            // 미래 날짜인 경우 클릭 불가능한 마커 표시
+                            if (targetDate.isAfter(today)) {
+                              return Container(
+                                width: 35,
+                                height: 35,
+                                margin: const EdgeInsets.only(top: 12),
+                                decoration: const BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Color(0xFFF5F5F5),
+                                ),
+                              );
+                            }
 
-                        if (isSameDay(date, today)) {
-                          return Container(
-                            width: 35,
-                            height: 35,
-                            margin: const EdgeInsets.only(top: 12),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: primaryLightColor,
-                            ),
-                            child: Icon(
-                              Icons.add,
-                              color: primaryColor,
-                              size: 24,
-                            ),
-                          );
-                        }
+                            if (isSameDay(date, today)) {
+                              return Container(
+                                width: 35,
+                                height: 35,
+                                margin: const EdgeInsets.only(top: 12),
+                                decoration: const BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: primaryLightColor,
+                                ),
+                                child: const Icon(
+                                  Icons.add,
+                                  color: primaryColor,
+                                  size: 24,
+                                ),
+                              );
+                            }
+                            print("date: $date");
+                            // 일기가 있는 날짜는 이모지로 표시
+                            final diaryEntry =
+                                Get.find<DiaryService>().getDiaryEntry(date);
+                            print("diaryEntry: $diaryEntry");
+                            if (diaryEntry != null) {
+                              String emojiImagePath =
+                                  getEmojiPath(diaryEntry.emotion);
+                              return Container(
+                                width: 35,
+                                height: 35,
+                                margin: const EdgeInsets.only(top: 12),
+                                child: Image.asset(
+                                  emojiImagePath,
+                                  fit: BoxFit.contain,
+                                ),
+                              );
+                            }
 
-                        // 일기가 있는 날짜는 이모지로 표시
-                        if (events.isNotEmpty) {
-                          final diaryEntry = Get.find<DiaryService>().getDiaryEntry(date);
-                          if (diaryEntry != null) {
-                            return Container(
-                              width: 35,
-                              height: 35,
-                              margin: const EdgeInsets.only(top: 12),
-                              child: Image.asset(
-                                'assets/emoji_images/${diaryEntry.emotion}_emoji.png',
-                                fit: BoxFit.contain,
+                            // 과거 날짜는 기본 마커로 표시
+                            if (targetDate.isBefore(today)) {
+                              return Container(
+                                width: 35,
+                                height: 35,
+                                margin: const EdgeInsets.only(top: 12),
+                                decoration: const BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Color(0xFFE5E5E5),
+                                ),
+                              );
+                            }
+
+                            return const SizedBox.shrink();
+                          },
+                          defaultBuilder: (context, day, focusedDay) {
+                            Widget? customText;
+
+                            if (day.weekday == DateTime.saturday) {
+                              customText = Text(
+                                '${day.day}',
+                                style: AppTextStyles.bodyLarge
+                                    .copyWith(color: customBlue),
+                              );
+                            } else if (day.weekday == DateTime.sunday) {
+                              customText = Text(
+                                '${day.day}',
+                                style: AppTextStyles.bodyLarge
+                                    .copyWith(color: customOrange),
+                              );
+                            } else {
+                              customText = Text(
+                                '${day.day}',
+                                style: AppTextStyles.bodyLarge,
+                              );
+                            }
+                            return buildDateContainer(
+                              child: customText,
+                            );
+                          },
+                          selectedBuilder: (context, day, focusedDay) {
+                            Widget? customText;
+                            if (day.weekday == DateTime.saturday) {
+                              customText = Text(
+                                '${day.day}',
+                                style: AppTextStyles.bodyLarge
+                                    .copyWith(color: customBlue),
+                              );
+                            } else if (day.weekday == DateTime.sunday) {
+                              customText = Text(
+                                '${day.day}',
+                                style: AppTextStyles.bodyLarge
+                                    .copyWith(color: customOrange),
+                              );
+                            } else {
+                              customText = Text(
+                                '${day.day}',
+                                style: AppTextStyles.bodyLarge,
+                              );
+                            }
+                            return buildDateContainer(
+                              child: customText,
+                            );
+                          },
+                          todayBuilder: (context, day, focusedDay) {
+                            return buildDateContainer(
+                              child: Text(
+                                '${day.day}',
+                                style: AppTextStyles.bodyLarge.copyWith(
+                                  color: primaryColor,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             );
-                          }
-                        }
-
-                        // 과거 날짜는 기본 마커로 표시
-                        if (targetDate.isBefore(today)) {
-                          return Container(
-                            width: 35,
-                            height: 35,
-                            margin: const EdgeInsets.only(top: 12),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: const Color(0xFFE5E5E5),
-                            ),
-                          );
-                        }
-
-                        return const SizedBox.shrink();
-                      },
-                      defaultBuilder: (context, day, focusedDay) {
-                        Widget? customText;
-
-                        if (day.weekday == DateTime.saturday) {
-                          customText = Text(
-                            '${day.day}',
-                            style: AppTextStyles.bodyLarge.copyWith(color: customBlue),
-                          );
-                        } else if (day.weekday == DateTime.sunday) {
-                          customText = Text(
-                            '${day.day}',
-                            style: AppTextStyles.bodyLarge.copyWith(color: customOrange),
-                          );
-                        } else {
-                          customText = Text(
-                            '${day.day}',
-                            style: AppTextStyles.bodyLarge,
-                          );
-                        }
-                        return buildDateContainer(
-                          child: customText,
-                        );
-                      },
-                      selectedBuilder: (context, day, focusedDay) {
-                        Widget? customText;
-                        if (day.weekday == DateTime.saturday) {
-                          customText = Text(
-                            '${day.day}',
-                            style: AppTextStyles.bodyLarge.copyWith(color: customBlue),
-                          );
-                        } else if (day.weekday == DateTime.sunday) {
-                          customText = Text(
-                            '${day.day}',
-                            style: AppTextStyles.bodyLarge.copyWith(color: customOrange),
-                          );
-                        } else {
-                          customText = Text(
-                            '${day.day}',
-                            style: AppTextStyles.bodyLarge,
-                          );
-                        }
-                        return buildDateContainer(
-                          child: customText,
-                        );
-                      },
-                      todayBuilder: (context, day, focusedDay) {
-                        return buildDateContainer(
-                          child: Text(
-                            '${day.day}',
-                            style: AppTextStyles.bodyLarge.copyWith(
-                              color: primaryColor,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        );
-                      },
-                      dowBuilder: (context, day) {
-                        if (day.weekday == DateTime.sunday) {
-                          return Center(
-                            child: Text(
-                              '일',
-                              style: AppTextStyles.calendarWeekday.copyWith(
-                                color: customOrange,
+                          },
+                          dowBuilder: (context, day) {
+                            if (day.weekday == DateTime.sunday) {
+                              return Center(
+                                child: Text(
+                                  '일',
+                                  style: AppTextStyles.calendarWeekday.copyWith(
+                                    color: customOrange,
+                                  ),
+                                ),
+                              );
+                            }
+                            if (day.weekday == DateTime.saturday) {
+                              return Center(
+                                child: Text(
+                                  '토',
+                                  style: AppTextStyles.calendarWeekday.copyWith(
+                                    color: customBlue,
+                                  ),
+                                ),
+                              );
+                            }
+                            return Center(
+                              child: Text(
+                                ['월', '화', '수', '목', '금'][day.weekday - 1],
+                                style: AppTextStyles.calendarWeekday,
                               ),
-                            ),
-                          );
-                        }
-                        if (day.weekday == DateTime.saturday) {
-                          return Center(
-                            child: Text(
-                              '토',
-                              style: AppTextStyles.calendarWeekday.copyWith(
-                                color: customBlue,
-                              ),
-                            ),
-                          );
-                        }
-                        return Center(
-                          child: Text(
-                            ['월', '화', '수', '목', '금'][day.weekday - 1],
-                            style: AppTextStyles.calendarWeekday,
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  if (controller.isLoading.value)
-                    Container(
-                      color: Colors.white.withOpacity(0.6),
-                      child: Center(
-                        child: CircularProgressIndicator(
-                          color: primaryColor,
+                            );
+                          },
                         ),
                       ),
-                    ),
-                ],
-              )),
+                      if (controller.isLoading.value)
+                        Container(
+                          color: Colors.white.withOpacity(0.6),
+                          child: const Center(
+                            child: CircularProgressIndicator(
+                              color: primaryColor,
+                            ),
+                          ),
+                        ),
+                    ],
+                  )),
             ),
           ],
         ),
@@ -422,7 +443,9 @@ class _MonthPickerSheetState extends State<MonthPickerSheet> {
             children: [
               IconButton(
                 icon: const Icon(Icons.arrow_back_ios, size: 20),
-                onPressed: currentDate.year <= firstYear ? null : () => changeYear(false),
+                onPressed: currentDate.year <= firstYear
+                    ? null
+                    : () => changeYear(false),
                 color: currentDate.year <= firstYear ? Colors.grey : null,
               ),
               Text(
@@ -433,7 +456,9 @@ class _MonthPickerSheetState extends State<MonthPickerSheet> {
               ),
               IconButton(
                 icon: const Icon(Icons.arrow_forward_ios, size: 20),
-                onPressed: currentDate.year >= lastYear ? null : () => changeYear(true),
+                onPressed: currentDate.year >= lastYear
+                    ? null
+                    : () => changeYear(true),
                 color: currentDate.year >= lastYear ? Colors.grey : null,
               ),
             ],
@@ -464,17 +489,23 @@ class _MonthPickerSheetState extends State<MonthPickerSheet> {
                   child: Container(
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      color: isSelected ? HomeScreen.primaryLightColor : Colors.transparent,
+                      color: isSelected
+                          ? HomeScreen.primaryLightColor
+                          : Colors.transparent,
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: isSelected ? HomeScreen.primaryColor : Colors.transparent,
+                        color: isSelected
+                            ? HomeScreen.primaryColor
+                            : Colors.transparent,
                       ),
                     ),
                     child: Text(
                       '${index + 1}월',
                       style: AppTextStyles.bodyLarge.copyWith(
-                        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                        color: isSelected ? HomeScreen.primaryColor : Colors.black,
+                        fontWeight:
+                            isSelected ? FontWeight.bold : FontWeight.normal,
+                        color:
+                            isSelected ? HomeScreen.primaryColor : Colors.black,
                       ),
                     ),
                   ),

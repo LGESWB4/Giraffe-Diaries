@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:giraffe_diaries/contants/stream_config.dart';
+import 'package:giraffe_diaries/services/stream_service.dart';
 import '../styles/text_styles.dart';
 
 class ChatDialog extends StatefulWidget {
@@ -18,6 +20,56 @@ class _ChatDialogState extends State<ChatDialog> {
   final List<Map<String, String>> _messages = [];
   final ScrollController _scrollController = ScrollController();
 
+  final StreamingService _streamingService = StreamingService();
+  String _message = '';
+  bool _isLoading = false;
+
+  void _startStreaming() {
+    const url = 'http://35.206.251.58:8081/v1/chat/completions';
+    var body = {
+      ...make_config_with_stream_type(true),
+      'messages': [
+        chat_prompt_config,
+        ..._messages,
+      ],
+    };
+
+    setState(() {
+      _isLoading = true;
+      // 스트리밍 시작할 때 새로운 메시지 추가
+      _messages.add({
+        'role': 'assistant',
+        'content': '',
+      });
+    });
+
+    _streamingService.streamPostRequest(url, body).listen(
+      (content) {
+        setState(() {
+          _message += content;
+          // 마지막 메시지(기린의 응답) 업데이트
+          _messages.last['content'] = _message;
+          print("content: $_message");
+        });
+        _scrollToBottom();
+      },
+      onError: (error) {
+        print('Error: $error');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $error')),
+        );
+        setState(() => _isLoading = false);
+      },
+      onDone: () {
+        setState(() {
+          _message = '';
+          _isLoading = false;
+        });
+        _scrollToBottom();
+      },
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -25,34 +77,30 @@ class _ChatDialogState extends State<ChatDialog> {
     Future.delayed(const Duration(milliseconds: 500), () {
       setState(() {
         _messages.add({
-          'sender': 'giraffe',
-          'message': '안녕하세요! 저는 당신의 이야기를 듣고 싶은 기린AI에요. 오늘 하루는 어떠셨나요?',
+          'role': 'assistant',
+          'content': '안녕하세요! 저는 당신의 이야기를 듣고 싶은 기린AI에요. 오늘 하루는 어떠셨나요?',
         });
       });
     });
   }
 
   void _sendMessage(String text) {
+    print("text: $text");
     if (text.trim().isEmpty) return;
 
     setState(() {
       _messages.add({
-        'sender': 'user',
-        'message': text,
+        'role': 'user',
+        'content': text,
       });
       // 기린의 응답 (예시)
-      Future.delayed(const Duration(seconds: 1), () {
-        setState(() {
-          _messages.add({
-            'sender': 'giraffe',
-            'message': '그렇군요. 더 자세히 이야기해주실 수 있나요?',
-          });
-        });
-        _scrollToBottom();
-      });
+
+      _message = '';
+      _isLoading = true;
     });
     _messageController.clear();
     _scrollToBottom();
+    _startStreaming();
   }
 
   void _scrollToBottom() {
@@ -104,14 +152,16 @@ class _ChatDialogState extends State<ChatDialog> {
               itemCount: _messages.length,
               itemBuilder: (context, index) {
                 final message = _messages[index];
-                final isUser = message['sender'] == 'user';
-                
+                final isUser = message['role'] == 'user';
+
                 return Padding(
                   padding: const EdgeInsets.symmetric(vertical: 4),
                   child: Row(
-                    mainAxisAlignment: isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+                    mainAxisAlignment: isUser
+                        ? MainAxisAlignment.end
+                        : MainAxisAlignment.start,
                     children: [
-                      if (!isUser) 
+                      if (!isUser)
                         Padding(
                           padding: const EdgeInsets.only(right: 8),
                           child: Container(
@@ -136,7 +186,8 @@ class _ChatDialogState extends State<ChatDialog> {
                         constraints: BoxConstraints(
                           maxWidth: MediaQuery.of(context).size.width * 0.7,
                         ),
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 10),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(20),
@@ -149,7 +200,7 @@ class _ChatDialogState extends State<ChatDialog> {
                           ],
                         ),
                         child: Text(
-                          message['message']!,
+                          message['content']!,
                           style: const TextStyle(
                             color: Colors.black,
                             fontSize: 16,
@@ -211,4 +262,4 @@ class _ChatDialogState extends State<ChatDialog> {
       ),
     );
   }
-} 
+}
