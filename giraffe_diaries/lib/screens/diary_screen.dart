@@ -3,11 +3,14 @@ import 'package:get/get.dart';
 import 'package:giraffe_diaries/screens/home_screen.dart';
 import '../styles/text_styles.dart';
 import 'chat_dialog.dart';
+import 'package:http/http.dart' as http;
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+import 'package:flutter/services.dart';
 
 class DiaryScreen extends StatelessWidget {
   final String generatedImageUrl;
   final String contenttext;
-  final List<String> hashtags = ['멋짐', '자신감'];
   String emojiImage;
   final DateTime selectedDate;
 
@@ -18,6 +21,52 @@ class DiaryScreen extends StatelessWidget {
     required this.contenttext,
     required this.emojiImage,
   });
+
+  Future<void> _saveImage() async {
+    try {
+      // 이미지 URL에서 이미지 데이터 다운로드
+      final response = await http.get(Uri.parse(generatedImageUrl));
+
+      if (response.statusCode == 200) {
+        // Pictures 디렉토리 가져오기
+        final directory = await getExternalStorageDirectory();
+        final picturesDir = Directory('${directory?.path}/Pictures');
+
+        // Pictures 디렉토리가 없으면 생성
+        if (!await picturesDir.exists()) {
+          await picturesDir.create(recursive: true);
+        }
+
+        final fileName = "giraffe_diary_${selectedDate.year}${selectedDate.month}${selectedDate.day}.png";
+        final file = File('${picturesDir.path}/$fileName');
+
+        // 이미지 데이터를 파일로 저장
+        await file.writeAsBytes(response.bodyBytes);
+
+        // 미디어 스캔을 위해 플랫폼 채널 호출
+        await const MethodChannel('giraffe_diaries').invokeMethod('scanFile', {'path': file.path});
+
+        Get.snackbar(
+          '저장 완료',
+          '이미지가 갤러리에 저장되었습니다.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+        );
+      } else {
+        throw Exception('이미지 다운로드 실패');
+      }
+    } catch (e) {
+      Get.snackbar(
+        '저장 실패',
+        '이미지 저장 중 오류가 발생했습니다.',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      print('이미지 저장 오류: $e');
+    }
+  }
 
   void _showImageDetail(BuildContext context) {
     showDialog(
@@ -34,9 +83,7 @@ class DiaryScreen extends StatelessWidget {
                   children: [
                     IconButton(
                       icon: const Icon(Icons.save_alt, color: Colors.black),
-                      onPressed: () {
-                        // TODO: 이미지 저장 기능 구현
-                      },
+                      onPressed: _saveImage,
                     ),
                     IconButton(
                       icon: const Icon(Icons.close, color: Colors.black),
@@ -64,7 +111,6 @@ class DiaryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    
     return Scaffold(
 
       backgroundColor: Colors.white,
@@ -78,9 +124,7 @@ class DiaryScreen extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.save_alt, color: Colors.black),
-            onPressed: () {
-              // TODO: 저장 기능 구현
-            },
+            onPressed: _saveImage,
           ),
           IconButton(
             icon: const Icon(Icons.menu, color: Colors.black),

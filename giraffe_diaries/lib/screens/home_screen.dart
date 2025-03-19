@@ -218,6 +218,28 @@ class HomeScreen extends GetView<CalendarController> {
                           );
                         }
 
+                        // 일기가 있는지 확인
+                        final diaryEntry = Get.find<DiaryService>().getDiaryEntry(date);
+
+                        // 일기가 있으면 이모지 표시 (오늘 날짜 포함)
+                        if (diaryEntry != null) {
+                          String emojiImagePath = getEmojiPath(diaryEntry.emotion);
+                          print("date: $date");
+                          print("emojiImagePath: $emojiImagePath");
+                          print("diaryEntry.emotion: ${diaryEntry.emotion}");
+                          print("diaryEntry.imageUrl: ${diaryEntry.imageUrl}");
+                          return Container(
+                            width: 35,
+                            height: 35,
+                            margin: const EdgeInsets.only(top: 12),
+                            child: Image.asset(
+                              emojiImagePath,
+                              fit: BoxFit.contain,
+                            ),
+                          );
+                        }
+
+                        // 오늘 날짜이고 일기가 없는 경우 + 아이콘 표시
                         if (isSameDay(date, today)) {
                           return Container(
                             width: 35,
@@ -234,24 +256,6 @@ class HomeScreen extends GetView<CalendarController> {
                             ),
                           );
                         }
-                        print("date: $date");
-                        // 일기가 있는 날짜는 이모지로 표시
-                        final diaryEntry =
-                                Get.find<DiaryService>().getDiaryEntry(date);
-                        print("diaryEntry: $diaryEntry");
-                        if (diaryEntry != null) {
-                              String emojiImagePath =
-                                  getEmojiPath(diaryEntry.emotion);
-                              return Container(
-                                width: 35,
-                                height: 35,
-                                margin: const EdgeInsets.only(top: 12),
-                                child: Image.asset(
-                                  emojiImagePath,
-                                  fit: BoxFit.contain,
-                                ),
-                              );
-                            }
 
                         // 과거 날짜는 기본 마커로 표시
                         if (targetDate.isBefore(today)) {

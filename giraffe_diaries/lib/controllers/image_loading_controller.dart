@@ -33,6 +33,7 @@ class ImageGenerationController extends GetxController {
       // 사용자 이름 가져오기
       final prefs = await SharedPreferences.getInstance();
       final username = prefs.getString('username') ?? '김덕륜';
+      print("username: $username");
 
       // 날짜 포맷팅
       final month = selectedDate.month.toString().padLeft(2, '0');
