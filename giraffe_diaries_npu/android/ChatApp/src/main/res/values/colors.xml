@@ -8,6 +8,7 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="bot_color">#9A9C27B0</color>
+    <color name="orange_color">#F6AD62</color>
     <color name="user_color">#2196F3</color>
     <color name="transparent">#00FFFFFF</color>
     <color name="chip_background">#F7F7F7</color>
