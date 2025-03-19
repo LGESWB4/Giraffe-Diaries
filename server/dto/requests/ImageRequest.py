@@ -8,4 +8,3 @@ class ImageRequest(BaseModel):
     emotion_query: str
     month: str
     date: str
-    style: str
