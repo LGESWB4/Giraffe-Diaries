@@ -3,29 +3,36 @@ import 'package:llama_library/llama_library.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/api_service.dart';
 import '../screens/diary_screen.dart';
-import '../models/model_load.dart';
+import '../models/model_send.dart';
 import '../models/diary_entry.dart';
 import '../services/diary_service.dart';
 import 'package:flutter/foundation.dart';
+import 'dart:convert';
+import '../models/model_load.dart';
 
 class ImageGenerationController extends GetxController {
   final RxBool isLoading = false.obs;
   final RxString generatedImageUrl = ''.obs;
-  late LlamaLibrary llamaLibrary;
+  late LlamaLibrary _llamaLibrary;
+  bool _isInitialized = false;
+
+  Future<String> llama_send_message(LlamaLibrary llamaLibrary, String user_message, String prompt_type) async {
+    
+    String modelResponse = await sendMessage(user_message, llamaLibrary, false, prompt_type ,(modelText){
+      debugPrint("model_res: $modelText");
+    });
+    debugPrint("modelResponse: $modelResponse");
+
+    // String encodedResponse = jsonEncode(modelResponse);
+    // debugPrint("encodedResponse: $encodedResponse");
+
+    return modelResponse;
+  }
+
   Future<void> generateImage(DateTime selectedDate, String contenttext, String selectedStyle) async {
     try {
       isLoading.value = true;
-      llamaLibrary = await modelLoad();
-      String modelResponse = await sendMessage(contenttext, llamaLibrary, false, (modelText){
-        debugPrint("model_res: $modelText");
-      });
-      
-      // modelResponse가 완료된 후 실행될 코드
-      if (modelResponse.isNotEmpty) {
-        // 응답 처리
-        debugPrint("모델 응답 완료: $modelResponse");
-        // 여기에 다음 작업 추가
-      }
+
 
       // 사용자 이름 가져오기
       final prefs = await SharedPreferences.getInstance();
@@ -74,6 +81,8 @@ class ImageGenerationController extends GetxController {
         generatedImageUrl: generatedImageUrl.value,
         selectedDate: selectedDate,
         contenttext: contenttext,
+        encodetext: contenttext,
+        llamaLibrary: _llamaLibrary,
       ));
 
     } catch (e) {

@@ -3,6 +3,9 @@ import 'package:get/get.dart';
 import '../controllers/image_loading_controller.dart';
 import 'dart:async';
 import '../styles/text_styles.dart';
+import 'package:giraffe_diaries/models/model_load.dart';
+import 'package:llama_library/llama_library.dart';
+import '../screens/diary_screen.dart';
 
 class ImageLoadingScreen extends StatefulWidget {
   final DateTime selectedDate;
@@ -21,12 +24,16 @@ class ImageLoadingScreen extends StatefulWidget {
 }
 
 class _ImageLoadingScreenState extends State<ImageLoadingScreen> {
-  final ImageGenerationController _controller = Get.find<ImageGenerationController>();
+  late ImageGenerationController _controller;
   int _currentImageIndex = 1;
   late Timer _imageTimer;
+  bool _isInitialized = false;
+  late LlamaLibrary llamaLibrary;
+  bool _isLoading = true;
+
   final List<String> _loadingTexts = [
-    'AI가 그림을 그리고 있어요...',
-    '멋진 그림을 그리는 중이에요...',
+    '기린이 일기를 읽고 있어요...',
+    '잠시만 기다려주세요...',
     '조금만 더 기다려주세요...',
   ];
   int _currentTextIndex = 0;
@@ -51,7 +58,37 @@ class _ImageLoadingScreenState extends State<ImageLoadingScreen> {
     });
 
     // AI 이미지 생성 시작
-    _controller.generateImage(widget.selectedDate, widget.contenttext, widget.selectedStyle);
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!Get.isRegistered<ImageGenerationController>()) {
+        Get.put(ImageGenerationController());
+      }
+      String encodetext = '';
+      _controller = Get.find<ImageGenerationController>();
+      DateTime llama_load_stime = DateTime.now();
+      llamaLibrary = await modelLoad();
+      DateTime llama_load_etime = DateTime.now();
+      Duration llama_load_duration = llama_load_etime.difference(llama_load_stime);
+      debugPrint('모델 로드 시간: ${llama_load_duration.inMilliseconds}ms');
+      setState(() {
+        _isLoading = false;
+      });
+
+      DateTime llama_send_stime = DateTime.now();
+      //await _controller.llama_send_message(llamaLibrary, widget.contenttext, widget.selectedStyle);
+      DateTime llama_send_etime = DateTime.now();
+      Duration llama_send_duration = llama_send_etime.difference(llama_send_stime);
+      debugPrint('모델 응답 시간: ${llama_send_duration.inMilliseconds}ms');
+      
+      Future.delayed(const Duration(milliseconds: 500));
+
+      Get.off(DiaryScreen(
+        selectedDate: widget.selectedDate, 
+        contenttext: widget.contenttext,
+        generatedImageUrl: '', 
+        encodetext: encodetext,
+        llamaLibrary: llamaLibrary
+      ));
+    });
   }
 
   @override

@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import '../firebase_options.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:giraffe_diaries/models/model_load.dart';
+
 
 typedef ProgressCallback = void Function(double progress);
 
@@ -71,14 +73,14 @@ Future<void> moveFile(String fileName) async {
 }
 
 Future<void> model_move() async {
-  await moveFile("Llama-3.2-Rabbit-Ko-3B-Instruct.i1-Q4_K_S.gguf");
+  await moveFile(model_name);
 }
 
 
 /// ✅ 모델 파일 경로 반환
 Future<String> getModelFile({ProgressCallback? onProgress}) async {
   final Directory appDir = await getApplicationDocumentsDirectory(); // 앱 데이터 저장 경로
-  final String modelPath = "${appDir.path}/Llama-3.2-Rabbit-Ko-3B-Instruct.i1-Q4_K_S.gguf"; // 모델 파일 경로
+  final String modelPath = "${appDir.path}/$model_name"; // 모델 파일 경로
   final File modelFile = File(modelPath); // 모델 파일 객체
 
   if (await modelFile.exists()) { // 모델 파일이 존재하는지 확인

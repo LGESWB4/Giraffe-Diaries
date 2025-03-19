@@ -2,21 +2,65 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../styles/text_styles.dart';
 import 'chat_dialog.dart';
+import '../models/model_load.dart';
+import 'package:llama_library/llama_library.dart';
+import '../models/model_send.dart';
 
-class DiaryScreen extends StatelessWidget {
-  final String generatedImageUrl;
-  final String contenttext;
+class DiaryScreen extends StatefulWidget {
   final List<String> hashtags = ['멋짐', '자신감'];
   final String emojiImage = 'assets/emoji_images/cool_emoji.jpg';
+  
+  final String generatedImageUrl;
   final DateTime selectedDate;
-
+  final String contenttext;
+  final String encodetext;
+  final LlamaLibrary llamaLibrary;
+  
   DiaryScreen({
     super.key,
     required this.generatedImageUrl,
     required this.selectedDate,
-
     required this.contenttext,
+    required this.encodetext,
+    required this.llamaLibrary,
   });
+
+  @override
+  State<DiaryScreen> createState() => _DiaryScreenState();
+}
+
+class _DiaryScreenState extends State<DiaryScreen> {
+  final LlamaLibraryChatHistory _chatHistory = LlamaLibraryChatHistory();
+  final List<Map<String, String>> _messages = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    // 초기 인사 메시지
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      
+      _chatHistory.clear();
+      
+      String response = '';
+      response = await chatmessage(widget.contenttext, widget.llamaLibrary, false, _chatHistory, (String modelres) {
+        debugPrint("modelres: $modelres");
+      });
+      _messages.add({
+        'sender': 'giraffe',
+        'message': response,
+      });
+      setState(() {
+        _isLoading = false;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    widget.llamaLibrary.dispose();
+    super.dispose();
+  }
 
   void _showImageDetail(BuildContext context) {
     showDialog(
@@ -49,7 +93,7 @@ class DiaryScreen extends StatelessWidget {
                   minScale: 0.5,
                   maxScale: 4.0,
                   child: Image.network(
-                    generatedImageUrl,
+                    widget.generatedImageUrl,
                     fit: BoxFit.contain,
                   ),
                 ),
@@ -63,9 +107,7 @@ class DiaryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    
     return Scaffold(
-
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -107,13 +149,13 @@ class DiaryScreen extends StatelessWidget {
                   child: Column(
                     children: [
                       Image.asset(
-                        emojiImage,
+                        widget.emojiImage,
                         width: 80,
                         height: 80,
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        '${selectedDate.year}년 ${selectedDate.month}월 ${selectedDate.day}일',
+                        '${widget.selectedDate.year}년 ${widget.selectedDate.month}월 ${widget.selectedDate.day}일',
                         style: AppTextStyles.heading1,
                       ),
                     ],
@@ -127,7 +169,7 @@ class DiaryScreen extends StatelessWidget {
                     spacing: 8,
                     runSpacing: 8,
                     alignment: WrapAlignment.center,
-                    children: hashtags.map((tag) => Container(
+                    children: widget.hashtags.map((tag) => Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
                         color: const Color(0xFFF7F7F7),
@@ -151,10 +193,37 @@ class DiaryScreen extends StatelessWidget {
                       onTap: () => _showImageDetail(context),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(15),
-                        child: Image.network(
-                          generatedImageUrl,
-                          fit: BoxFit.cover,
-                        ),
+                        child: widget.generatedImageUrl.isEmpty
+                          ? Container(
+                              width: double.infinity,
+                              height: 200,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[200],
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.image_not_supported,
+                                    size: 48,
+                                    color: Colors.grey[400],
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    '이미지가 없습니다',
+                                    style: TextStyle(
+                                      color: Colors.grey[600],
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          : Image.network(
+                              widget.generatedImageUrl,
+                              fit: BoxFit.contain,
+                            ),
                       ),
                     ),
                   ),
@@ -166,7 +235,7 @@ class DiaryScreen extends StatelessWidget {
                   child: Container(
                     constraints: const BoxConstraints(maxWidth: 300),
                     child: Text(
-                      contenttext,
+                      widget.contenttext,
                       textAlign: TextAlign.center,
                       style: AppTextStyles.bodyLarge,
                     ),
@@ -189,7 +258,7 @@ class DiaryScreen extends StatelessWidget {
                 height: 50,
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {
+                  onPressed: _isLoading ? null : () {
                     showModalBottomSheet(
                       context: context,
                       isScrollControlled: true,
@@ -200,21 +269,27 @@ class DiaryScreen extends StatelessWidget {
                         padding: EdgeInsets.only(
                           bottom: MediaQuery.of(context).viewInsets.bottom,
                         ),
-                        child: ChatDialog(selectedDate: selectedDate),
+                        child: ChatDialog(
+                          selectedDate: widget.selectedDate,
+                          contenttext: widget.contenttext,
+                          llamaLibrary: widget.llamaLibrary,
+                          chatHistory: _chatHistory,
+                          messages: _messages,
+                        ),
                       ),
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFF6AD62),
+                    backgroundColor: _isLoading ? Color(0xFFE5E5E5) : const Color(0xFFF6AD62),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                     elevation: 2,
                   ),
                   child: Text(
-                    '기린과 대화할래?',
+                    _isLoading ? '기린이 준비중...' : '기린과 대화할래?',
                     style: AppTextStyles.buttonText.copyWith(
-                      color: Colors.white,
+                      color: _isLoading ? Colors.black : Colors.white,
                     ),
                   ),
                 ),

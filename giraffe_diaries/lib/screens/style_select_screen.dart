@@ -8,7 +8,7 @@ import '../widgets/exit_confirmation_dialog.dart';
 class StyleSelectScreen extends GetView<StyleSelectController> {
   final DateTime selectedDate;
   final String contenttext;
-
+  
   const StyleSelectScreen({
     super.key,
     required this.selectedDate,

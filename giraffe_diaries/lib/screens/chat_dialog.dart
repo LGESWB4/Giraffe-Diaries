@@ -1,12 +1,24 @@
 import 'package:flutter/material.dart';
 import '../styles/text_styles.dart';
+import '../models/model_load.dart';
+import 'package:get/get.dart';
+import '../models/model_send.dart';
+import 'package:llama_library/llama_library.dart';
+import 'dart:async';
 
 class ChatDialog extends StatefulWidget {
   final DateTime selectedDate;
-
+  final String contenttext;
+  final LlamaLibrary llamaLibrary;
+  final LlamaLibraryChatHistory chatHistory;
+  final List<Map<String, String>> messages;
   const ChatDialog({
     super.key,
     required this.selectedDate,
+    required this.contenttext,
+    required this.llamaLibrary,
+    required this.chatHistory,
+    required this.messages,
   });
 
   @override
@@ -15,44 +27,38 @@ class ChatDialog extends StatefulWidget {
 
 class _ChatDialogState extends State<ChatDialog> {
   final TextEditingController _messageController = TextEditingController();
-  final List<Map<String, String>> _messages = [];
   final ScrollController _scrollController = ScrollController();
+  late LlamaLibraryChatHistory _chatHistory;
+  late List<Map<String, String>> _messages;
+  late LlamaLibrary _llamaLibrary;
+  bool _isInitialized = false;
+  bool _isLoading = false;
+  String _currentResponse = '';
+  Timer? _loadingTimer;
+  String _loadingDots = '';
+  bool _isFirstResponse = true;
 
   @override
   void initState() {
     super.initState();
+    _chatHistory = widget.chatHistory;
+    _messages = widget.messages;
     // 초기 인사 메시지
-    Future.delayed(const Duration(milliseconds: 500), () {
-      setState(() {
-        _messages.add({
-          'sender': 'giraffe',
-          'message': '안녕하세요! 저는 당신의 이야기를 듣고 싶은 기린AI에요. 오늘 하루는 어떠셨나요?',
-        });
-      });
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!_isInitialized) {
+        _llamaLibrary = widget.llamaLibrary;
+        _isInitialized = true;
+      }
+      _scrollToBottom();
     });
   }
 
-  void _sendMessage(String text) {
-    if (text.trim().isEmpty) return;
-
-    setState(() {
-      _messages.add({
-        'sender': 'user',
-        'message': text,
-      });
-      // 기린의 응답 (예시)
-      Future.delayed(const Duration(seconds: 1), () {
-        setState(() {
-          _messages.add({
-            'sender': 'giraffe',
-            'message': '그렇군요. 더 자세히 이야기해주실 수 있나요?',
-          });
-        });
-        _scrollToBottom();
-      });
-    });
-    _messageController.clear();
-    _scrollToBottom();
+  @override
+  void dispose() {
+    _messageController.dispose();
+    _scrollController.dispose();
+    _loadingTimer?.cancel();
+    super.dispose();
   }
 
   void _scrollToBottom() {
@@ -65,150 +71,226 @@ class _ChatDialogState extends State<ChatDialog> {
     }
   }
 
+  void _startLoadingAnimation() {
+    _loadingTimer?.cancel();
+    _loadingTimer = Timer.periodic(const Duration(milliseconds: 500), (timer) {
+      setState(() {
+        _loadingDots = _loadingDots.length >= 3 ? '' : _loadingDots + '.';
+      });
+    });
+  }
+
+  void _stopLoadingAnimation() {
+    _loadingTimer?.cancel();
+    setState(() {
+      _loadingDots = '';
+    });
+  }
+
+  Future<void> _sendMessage() async {
+    if (_messageController.text.trim().isEmpty) return;
+
+    final userMessage = _messageController.text;
+    _messageController.clear();
+
+    setState(() {
+      widget.messages.add({
+        'sender': 'user',
+        'message': userMessage,
+      });
+      _isLoading = true;
+      _currentResponse = '';
+      _isFirstResponse = true;
+      _startLoadingAnimation();
+    });
+
+    _scrollToBottom();
+
+    try {
+      String response = await chatmessage(
+        userMessage,
+        widget.llamaLibrary,
+        false,
+        widget.chatHistory,
+        (String modelres) {
+          setState(() {
+            if (_isFirstResponse) {
+              widget.messages.add({
+                'sender': 'giraffe',
+                'message': modelres,
+              });
+              _isFirstResponse = false;
+            } else {
+              widget.messages.last['message'] = modelres;
+            }
+            _currentResponse = modelres;
+            _stopLoadingAnimation();
+          });
+        },
+      );
+
+      setState(() {
+        _isLoading = false;
+        _currentResponse = '';
+      });
+    } catch (e) {
+      setState(() {
+        widget.messages.add({
+          'sender': 'giraffe',
+          'message': '죄송합니다. 오류가 발생했습니다.',
+        });
+        _isLoading = false;
+        _currentResponse = '';
+      });
+    }
+
+    _scrollToBottom();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: MediaQuery.of(context).size.height * 0.7,
-      decoration: const BoxDecoration(
-        color: Color(0xFFFFEDDA),
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 12),
-            child: Column(
-              children: [
-                Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  '${widget.selectedDate.year}년 ${widget.selectedDate.month}월 ${widget.selectedDate.day}일',
-                  style: AppTextStyles.bodyLarge.copyWith(
-                    color: Colors.black,
-                  ),
-                ),
-              ],
-            ),
+    return DraggableScrollableSheet(
+      initialChildSize: 0.7,
+      minChildSize: 0.5,
+      maxChildSize: 0.95,
+      builder: (context, scrollController) {
+        return Container(
+          decoration: const BoxDecoration(
+            color: Color(0xFFFFEDDA),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
           ),
-          Expanded(
-            child: ListView.builder(
-              controller: _scrollController,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              itemCount: _messages.length,
-              itemBuilder: (context, index) {
-                final message = _messages[index];
-                final isUser = message['sender'] == 'user';
-                
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4),
-                  child: Row(
-                    mainAxisAlignment: isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
-                    children: [
-                      if (!isUser) 
-                        Padding(
-                          padding: const EdgeInsets.only(right: 8),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: const Color(0xFFEA580C),
-                                width: 1,
-                              ),
-                            ),
-                            child: CircleAvatar(
-                              backgroundColor: Colors.white,
-                              child: Image.asset(
-                                'assets/images/giraffe_logo.png',
-                                width: 30,
-                                height: 30,
-                              ),
-                            ),
-                          ),
-                        ),
-                      Container(
-                        constraints: BoxConstraints(
-                          maxWidth: MediaQuery.of(context).size.width * 0.7,
-                        ),
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
-                              blurRadius: 5,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: Text(
-                          message['message']!,
-                          style: const TextStyle(
-                            color: Colors.black,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 10,
-                ),
-              ],
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _messageController,
-                    decoration: InputDecoration(
-                      hintText: '기린과 대화하세요!',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(25),
-                        borderSide: BorderSide.none,
-                      ),
-                      filled: true,
-                      fillColor: Colors.grey[100],
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 10,
+          child: Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: Column(
+                  children: [
+                    Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(2),
                       ),
                     ),
-                  ),
+                    const SizedBox(height: 12),
+                    Text(
+                      '${widget.selectedDate.year}년 ${widget.selectedDate.month}월 ${widget.selectedDate.day}일',
+                      style: AppTextStyles.bodyLarge.copyWith(
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 8),
-                Container(
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFF6AD62),
-                    shape: BoxShape.circle,
-                  ),
-                  child: IconButton(
-                    onPressed: () => _sendMessage(_messageController.text),
-                    icon: const Icon(Icons.send, color: Colors.white),
-                  ),
+              ),
+              Expanded(
+                child: ListView.builder(
+                  controller: scrollController,
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  itemCount: widget.messages.length,
+                  itemBuilder: (context, index) {
+                    final message = widget.messages[index];
+                    final isUser = message['sender'] == 'user';
+                    final messageText = message['message'] ?? '';
+
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: Row(
+                        mainAxisAlignment: isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+                        children: [
+                          if (!isUser) ...[
+                            CircleAvatar(
+                              backgroundImage: AssetImage('assets/images/giraffe_logo.png'),
+                              radius: 20,
+                            ),
+                            const SizedBox(width: 8),
+                          ],
+                          Flexible(
+                            child: Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: isUser ? const Color(0xFFF6AD62) : Colors.white,
+                                borderRadius: BorderRadius.circular(12),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.05),
+                                    blurRadius: 5,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: Text(
+                                messageText,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: isUser ? Colors.white : Colors.black,
+                                ),
+                              ),
+                            ),
+                          ),
+                          if (isUser) ...[
+                            const SizedBox(width: 8),
+                            const CircleAvatar(
+                              radius: 20,
+                              backgroundColor: Colors.grey,
+                              child: Icon(Icons.person, color: Colors.white),
+                            ),
+                          ],
+                        ],
+                      ),
+                    );
+                  },
                 ),
-              ],
-            ),
+              ),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 10,
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _messageController,
+                        decoration: InputDecoration(
+                          hintText: '기린과 대화하세요!',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(25),
+                            borderSide: BorderSide.none,
+                          ),
+                          filled: true,
+                          fillColor: Colors.grey[100],
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 10,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFF6AD62),
+                        shape: BoxShape.circle,
+                      ),
+                      child: IconButton(
+                        onPressed: _sendMessage,
+                        icon: const Icon(Icons.send, color: Colors.white),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 } 

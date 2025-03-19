@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../styles/text_styles.dart';
 import '../controllers/diary_controller.dart';
-
+import 'package:llama_library/llama_library.dart';
+import '../models/model_load.dart';
 class DiaryWriteButton extends GetView<DiaryController> {
+  
   const DiaryWriteButton({super.key});
 
   @override
@@ -22,7 +24,7 @@ class DiaryWriteButton extends GetView<DiaryController> {
         child: Obx(
           () => ElevatedButton(
             onPressed: controller.isButtonEnabled.value
-                ? controller.saveDiary
+                ? () => controller.saveDiary()
                 : null,
             style: ElevatedButton.styleFrom(
               backgroundColor: controller.isButtonEnabled.value

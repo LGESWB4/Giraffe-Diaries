@@ -60,7 +60,8 @@ class StyleSelectController extends GetxController {
 
   void skipSelection() {
     onStyleSelected("수채화");
-    Get.to(() => ImageLoadingScreen(selectedDate: selectedDate, contenttext: contenttext, selectedStyle: "수채화")); // 또는 다음 화면으로 이동하는 로직
+    //Get.to(() => ImageLoadingScreen(selectedDate: selectedDate, contenttext: contenttext, selectedStyle: "수채화")); // 또는 다음 화면으로 이동하는 로직
+    Get.back();
   }
 
   void confirmSelection() {
@@ -70,12 +71,7 @@ class StyleSelectController extends GetxController {
       // 임시로 스타일 정보만 저장
       onStyleSelected(selectedStyleName);
 
-      // 로딩 화면으로 전환하고 이미지 생성 시작
-      Get.to(() => ImageLoadingScreen(
-        selectedDate: selectedDate,
-        contenttext: contenttext,
-        selectedStyle: selectedStyleName
-      ));
+      Get.back();
     }
   }
 }
