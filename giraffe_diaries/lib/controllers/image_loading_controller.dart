@@ -37,7 +37,7 @@ class ImageGenerationController extends GetxController {
 
       // 사용자 이름 가져오기
       final prefs = await SharedPreferences.getInstance();
-      final username = prefs.getString('username') ?? '김덕륜';
+      final username = prefs.getString('username') ?? '';
       print("username: $username");
 
       // 날짜 포맷팅
@@ -89,6 +89,7 @@ class ImageGenerationController extends GetxController {
           contenttext: contenttext,
           emojiImagePath: emojiImagePath,
           selectedStyle: '',
+          generatedImageUrl: '',
         ),
       );
       print("화면 전환 완료");

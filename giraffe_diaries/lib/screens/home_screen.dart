@@ -58,12 +58,14 @@ class HomeScreen extends GetView<CalendarController> {
     final today = DateTime(now.year, now.month, now.day);
 
     // 미래 날짜는 선택 불가
-    if (selectedDate.isAfter(today)) {
+    if (selectedDate.isAfter(today) &&
+        !selectedDate.isAtSameMomentAs(selectedDate)) {
       return;
     }
 
     // 일기가 있으면 보기 화면으로
     final diaryEntry = Get.find<DiaryService>().getDiaryEntry(selectedDate);
+    print("diaryEntry: $diaryEntry");
     if (diaryEntry != null) {
       // 일기 보기 화면으로 이동
       String emojiImagePath = getEmojiPath(diaryEntry.emotion);
@@ -73,6 +75,7 @@ class HomeScreen extends GetView<CalendarController> {
           contenttext: diaryEntry.content,
           emojiImagePath: emojiImagePath,
           selectedStyle: diaryEntry.style,
+          generatedImageUrl: diaryEntry.imageUrl,
         ),
       );
     } else {

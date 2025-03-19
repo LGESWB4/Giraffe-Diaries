@@ -1,4 +1,7 @@
 import 'package:get/get.dart';
+import 'package:giraffe_diaries/controllers/emoji_controller.dart';
+import 'package:giraffe_diaries/screens/diary_screen.dart';
+import 'package:giraffe_diaries/services/api_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:giraffe_diaries/controllers/image_loading_controller.dart';
 import '../screens/image_loading_screen.dart';
@@ -47,8 +50,8 @@ class StyleSelectController extends GetxController {
       style: style,
       keywords: existingEntry?.keywords ?? "",
       emotion: existingEntry?.emotion ?? "",
-      imageUrl: existingEntry?.imageUrl ?? "", // 이미지 URL은 비워둠
-      hashtags: existingEntry?.hashtags ?? [''],
+      imageUrl: "", // 이미지 URL은 비워둠
+      hashtags: existingEntry?.hashtags ?? [],
     );
 
     await diaryService.saveDiaryEntry(entry);
@@ -66,18 +69,54 @@ class StyleSelectController extends GetxController {
     ); // 또는 다음 화면으로 이동하는 로직
   }
 
-  void confirmSelection() {
+  void confirmSelection() async {
     if (selectedStyle.value >= 0) {
       final selectedStyleName = styles[selectedStyle.value]['name']!;
 
       // 임시로 스타일 정보만 저장
       onStyleSelected(selectedStyleName);
 
+      final prefs = await SharedPreferences.getInstance();
+      final username = prefs.getString('username') ?? '';
+
+      final diaryService = Get.find<DiaryService>();
+      final existingEntry = diaryService.getDiaryEntry(selectedDate);
+      print("기존 다이어리 항목: ${existingEntry != null}");
+      String emojiImagePath = getEmojiPath(existingEntry?.emotion ?? "");
+
+      final imagePath = await ApiService.generateImage(
+        username: username,
+        inputWord: existingEntry?.keywords ?? "",
+        month: selectedDate.month.toString().padLeft(2, '0'),
+        date: selectedDate.day.toString().padLeft(2, '0'),
+        styleWord: selectedStyleName,
+        emotionQuery: existingEntry?.emotion ?? "",
+      );
+
+      // 이미지 URL 생성
+      final generatedImageUrl = ApiService.getImageUrl(imagePath);
+      print("generatedImageUrl: $generatedImageUrl");
+
+      final updatedEntry = DiaryEntry(
+        username: username,
+        date: selectedDate,
+        content: contenttext,
+        style: existingEntry?.style ?? '',
+        emotion: existingEntry?.emotion ?? '',
+        imageUrl: generatedImageUrl,
+        hashtags: existingEntry?.hashtags ?? [],
+        keywords: existingEntry?.keywords ?? '',
+      );
+      await diaryService.saveDiaryEntry(updatedEntry);
+
       // 로딩 화면으로 전환하고 이미지 생성 시작
-      Get.to(
-        () => ImageLoadingScreen(
+      Get.offAll(
+        () => DiaryScreen(
           selectedDate: selectedDate,
           contenttext: contenttext,
+          emojiImagePath: emojiImagePath,
+          selectedStyle: selectedStyleName,
+          generatedImageUrl: generatedImageUrl,
         ),
       );
     }
