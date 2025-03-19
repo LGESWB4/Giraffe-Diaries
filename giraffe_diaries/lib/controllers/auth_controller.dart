@@ -21,11 +21,7 @@ class AuthController extends GetxController {
 
   Future<void> checkLoginStatus() async {
     _prefs ??= await SharedPreferences.getInstance();
-
-    var savedusername = _prefs?.getString('username') ?? '';
-
-    // savedNickname 값 "" 로 초기화
-    savedusername = "";
+    final savedusername = _prefs?.getString('username') ?? '';
 
     if (savedusername.isNotEmpty) {
       userName.value = savedusername;
@@ -65,7 +61,9 @@ class AuthController extends GetxController {
 
   Future<void> logout() async {
     _prefs ??= await SharedPreferences.getInstance();
-    await _prefs?.remove('username');
+
+    //await _prefs?.remove('username');
+
     userName.value = '';
     isLoggedIn.value = false;
     Get.offAll(() => LoginScreen(), transition: Transition.fadeIn);

@@ -6,8 +6,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:llama_library/llama_library.dart';
 import 'package:llama_library/scheme/scheme/api/api.dart';
 
-String model_name = "Llama-3.2-Rabbit-Ko-3B-Instruct.i1-Q4_K_S.gguf";
-//String model_name = "ktdsbaseLM-v0.13-onbased-llama3.1-Q4_K_M.gguf";
+//String model_name = "Llama-3.2-Rabbit-Ko-3B-Instruct.i1-Q4_K_S.gguf";
+String model_name = "ktdsbaseLM-v0.13-onbased-llama3.1-Q4_K_M.gguf";
 
 Future<LlamaLibrary> modelLoad() async {
   debugPrint("모델 로딩 시작...");

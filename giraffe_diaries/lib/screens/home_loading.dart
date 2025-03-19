@@ -4,6 +4,8 @@ import 'package:giraffe_diaries/controllers/auth_controller.dart';
 import 'dart:async';
 import '../styles/text_styles.dart';
 import '../models/model_download.dart';
+import 'package:llama_library/llama_library.dart';
+import 'package:giraffe_diaries/models/model_load.dart';
 
 class HomeLoadingScreen extends StatefulWidget {
   const HomeLoadingScreen({super.key});
@@ -24,17 +26,16 @@ class _HomeLoadingScreenState extends State<HomeLoadingScreen> {
     super.initState();
     // 이미지 애니메이션 시작
 
-    
     _imageTimer = Timer.periodic(const Duration(milliseconds: 200), (timer) {
       setState(() {
-        _currentImageIndex = _currentImageIndex == 2 ? 1 : _currentImageIndex + 1;
+        _currentImageIndex =
+            _currentImageIndex == 2 ? 1 : _currentImageIndex + 1;
       });
     });
 
     // 모델 다운로드 시작
     _checkAndDownloadModel();
     //testllama();
-
   }
 
   Future<void> _checkAndDownloadModel() async {
@@ -52,7 +53,9 @@ class _HomeLoadingScreenState extends State<HomeLoadingScreen> {
           });
         },
       );
-      
+      LlamaLibrary llama_library = await modelLoad();
+      Get.put(llama_library);
+
       // 다운로드 완료 후 로그인 상태 확인
       _imageTimer.cancel();
       Get.put(AuthController());
@@ -85,10 +88,7 @@ class _HomeLoadingScreenState extends State<HomeLoadingScreen> {
               height: 200,
             ),
             const SizedBox(height: 30),
-            const Text(
-              '네가그린기린일기',
-              style: AppTextStyles.heading2,
-            ),
+            const Text('네가 그린 기린 일기', style: AppTextStyles.heading2),
             SizedBox(
               width: 200,
               child: Column(
@@ -98,7 +98,9 @@ class _HomeLoadingScreenState extends State<HomeLoadingScreen> {
                     LinearProgressIndicator(
                       value: _downloadProgress,
                       backgroundColor: Colors.grey[200],
-                      valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFFF6AD62)),
+                      valueColor: const AlwaysStoppedAnimation<Color>(
+                        Color(0xFFF6AD62),
+                      ),
                     ),
                     const SizedBox(height: 10),
                     Text(
@@ -128,7 +130,10 @@ class _HomeLoadingScreenState extends State<HomeLoadingScreen> {
                           foregroundColor: Colors.white,
                           minimumSize: const Size(double.infinity, 40),
                         ),
-                        child: const Text('다시 시도', style: AppTextStyles.bodybold,),
+                        child: const Text(
+                          '다시 시도',
+                          style: AppTextStyles.bodybold,
+                        ),
                       ),
                     ),
                   ],
@@ -140,4 +145,4 @@ class _HomeLoadingScreenState extends State<HomeLoadingScreen> {
       ),
     );
   }
-} 
+}

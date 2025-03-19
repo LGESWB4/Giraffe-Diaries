@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:giraffe_diaries/controllers/image_loading_controller.dart';
 import '../controllers/diary_controller.dart';
 import '../styles/text_styles.dart';
 import '../widgets/diary_write_button.dart';
@@ -7,12 +8,14 @@ import '../widgets/exit_confirmation_dialog.dart';
 
 class DiaryWriteScreen extends GetView<DiaryController> {
   final DateTime selectedDate;
+  late final ImageGenerationController imageGenerationController;
 
-  const DiaryWriteScreen({
-    super.key,
-    required this.selectedDate,
-
-  });
+  DiaryWriteScreen({super.key, required this.selectedDate}) {
+    if (!Get.isRegistered<ImageGenerationController>()) {
+      Get.put(ImageGenerationController());
+    }
+    imageGenerationController = Get.find<ImageGenerationController>();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +24,7 @@ class DiaryWriteScreen extends GetView<DiaryController> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      resizeToAvoidBottomInset: false,  // 키보드가 올라올 때 화면 리사이즈 방지
+      resizeToAvoidBottomInset: false, // 키보드가 올라올 때 화면 리사이즈 방지
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -32,7 +35,11 @@ class DiaryWriteScreen extends GetView<DiaryController> {
         actions: [
           IconButton(
             icon: const Icon(Icons.close, color: Colors.black),
-            onPressed: () => Get.dialog(const ExitConfirmationDialog(), barrierDismissible: false,),
+            onPressed:
+                () => Get.dialog(
+                  const ExitConfirmationDialog(),
+                  barrierDismissible: false,
+                ),
           ),
         ],
       ),
@@ -45,10 +52,7 @@ class DiaryWriteScreen extends GetView<DiaryController> {
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: Row(
                 children: [
-                  Image.asset(
-                    'assets/images/giraffe_logo.png',
-                    height: 40,
-                  ),
+                  Image.asset('assets/images/giraffe_logo.png', height: 40),
                   const SizedBox(width: 12),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -91,7 +95,9 @@ class DiaryWriteScreen extends GetView<DiaryController> {
                   style: AppTextStyles.bodyLarge,
                   decoration: InputDecoration(
                     hintText: '오늘 어떤 일이 있었나요?',
-                    hintStyle: AppTextStyles.bodyLarge.copyWith(color: Colors.grey),
+                    hintStyle: AppTextStyles.bodyLarge.copyWith(
+                      color: Colors.grey,
+                    ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide.none,

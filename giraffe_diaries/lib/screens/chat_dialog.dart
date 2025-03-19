@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:giraffe_diaries/contants/stream_config.dart';
+import 'package:giraffe_diaries/services/stream_service.dart';
 import '../styles/text_styles.dart';
 import '../models/model_load.dart';
 import 'package:get/get.dart';
@@ -9,14 +11,12 @@ import 'dart:async';
 class ChatDialog extends StatefulWidget {
   final DateTime selectedDate;
   final String contenttext;
-  final LlamaLibrary llamaLibrary;
   final LlamaLibraryChatHistory chatHistory;
   final List<Map<String, String>> messages;
   const ChatDialog({
     super.key,
     required this.selectedDate,
     required this.contenttext,
-    required this.llamaLibrary,
     required this.chatHistory,
     required this.messages,
   });
@@ -38,6 +38,55 @@ class _ChatDialogState extends State<ChatDialog> {
   String _loadingDots = '';
   bool _isFirstResponse = true;
 
+  final StreamingService _streamingService = StreamingService();
+  String _message = '';
+
+    void _startStreaming() {
+    const url = 'http://35.206.251.58:8081/v1/chat/completions';
+    var body = {
+      ...make_config_with_stream_type(true),
+      'messages': [
+        chat_prompt_config,
+        ..._messages,
+      ],
+    };
+
+    setState(() {
+      _isLoading = true;
+      // 스트리밍 시작할 때 새로운 메시지 추가
+      _messages.add({
+        'role': 'assistant',
+        'content': '',
+      });
+    });
+
+    _streamingService.streamPostRequest(url, body).listen(
+      (content) {
+        setState(() {
+          _message += content;
+          // 마지막 메시지(기린의 응답) 업데이트
+          _messages.last['content'] = _message;
+          print("content: $_message");
+        });
+        _scrollToBottom();
+      },
+      onError: (error) {
+        print('Error: $error');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $error')),
+        );
+        setState(() => _isLoading = false);
+      },
+      onDone: () {
+        setState(() {
+          _message = '';
+          _isLoading = false;
+        });
+        _scrollToBottom();
+      },
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -46,7 +95,7 @@ class _ChatDialogState extends State<ChatDialog> {
     // 초기 인사 메시지
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!_isInitialized) {
-        _llamaLibrary = widget.llamaLibrary;
+        _llamaLibrary = Get.find<LlamaLibrary>() ?? await modelLoad();
         _isInitialized = true;
       }
       _scrollToBottom();
@@ -99,8 +148,11 @@ class _ChatDialogState extends State<ChatDialog> {
         'message': userMessage,
       });
       _isLoading = true;
+      widget.messages.add({
+        'sender': 'user',
+        'message': _loadingDots,
+      });
       _currentResponse = '';
-      _isFirstResponse = true;
       _startLoadingAnimation();
     });
 
@@ -109,26 +161,17 @@ class _ChatDialogState extends State<ChatDialog> {
     try {
       String response = await chatmessage(
         userMessage,
-        widget.llamaLibrary,
+        Get.find<LlamaLibrary>(),
         false,
         widget.chatHistory,
         (String modelres) {
           setState(() {
-            if (_isFirstResponse) {
-              widget.messages.add({
-                'sender': 'giraffe',
-                'message': modelres,
-              });
-              _isFirstResponse = false;
-            } else {
-              widget.messages.last['message'] = modelres;
-            }
+            widget.messages.last['message'] = widget.messages.last['message']! + modelres;
             _currentResponse = modelres;
             _stopLoadingAnimation();
           });
         },
       );
-
       setState(() {
         _isLoading = false;
         _currentResponse = '';

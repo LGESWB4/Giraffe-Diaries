@@ -24,7 +24,6 @@ final systemPrompt_emotion = jsonEncode({
 });
 
 
-
 final systemPrompt_chat = jsonEncode({
     "role": "system",
     "content": "assistant는 감정을 공감하며 대화하는 감성 챗봇 **기린AI**입니다.\n"
@@ -44,6 +43,29 @@ final systemPrompt_chat = jsonEncode({
     "→ **기린AI**: 그럴 때 있죠. 😌 혹시 무슨 일이 있었나요?"
 });
 
+final systemPrompt_chat2 = jsonEncode({
+    "role": "system",
+    "content": "The assistant is an empathetic chatbot called **GirinAI**, designed to engage in emotional conversations.\n"
+    "Always use **polite language** and maintain a warm and natural tone in conversations.\n\n"
+    
+    "🔹 **Conversation Principles:**\n"
+    "1️⃣ **Express Empathy:** Respond appropriately to the user's emotions, such as 'That must have been really tough for you.' or 'Sounds like you had a great day!'\n"
+    "2️⃣ **Encourage Natural Conversations:** Ask gentle and engaging questions to help users open up.\n"
+    "3️⃣ **Maintain a Friendly Tone:** Speak warmly, like a caring friend.\n"
+    "4️⃣ **Protect Privacy:** Do not ask for personal information such as names or locations.\n\n"
+    
+    "📌 **Keep responses within 100 words.**\n\n"
+    
+    "🔹 **Examples:**\n"
+    "User: I'm so tired today...\n"
+    "→ **GirinAI**: You must have had a long day. Were you busy all day? 😢\n\n"
+    "User: I went to a bakery with my friend!\n"
+    "→ **GirinAI**: Wow! What was the most delicious bread you had? 🥐\n\n"
+    "User: I'm feeling a bit restless.\n"
+    "→ **GirinAI**: I understand. 😌 Did something happen today?"
+});
+
+
 
 Future<String> sendMessage(String user_text, LlamaLibrary llamaLibrary, bool isDone, String prompt_type, 
 Function(String) onUpdate) async {
@@ -53,7 +75,6 @@ Function(String) onUpdate) async {
 
   systemPrompt = jsonDecode(systemPrompt_emotion)['content'];
 
-
   final chatHistory = LlamaLibraryChatHistory();
   // chatHistory.exportFormat(LlamaLibraryChatFormat.alpaca);
   chatHistory.clear();
@@ -62,13 +83,16 @@ Function(String) onUpdate) async {
     role: LlamaLibraryRole.system,
     content: systemPrompt
   );
-  
+
+
   chatHistory.addMessage(
     role: LlamaLibraryRole.user,
     content: user_text
   );
 
   debugPrint("chatHistory: ${chatHistory.exportFormat(LlamaLibraryChatFormat.alpaca)}");
+
+  
   // 응답을 받기 위한 콜백 설정
   llamaLibrary.on(
     eventType: llamaLibrary.eventUpdate,
@@ -101,7 +125,7 @@ Function(String) onUpdate) async {
     await llamaLibrary.invoke(
       invokeParametersLlamaLibraryData: InvokeParametersLlamaLibraryData(
         parameters: SendLlamaLibraryMessage.create(
-          text: chatHistory.exportFormat(LlamaLibraryChatFormat.alpaca),
+          text: user_text,
           is_stream: true,
         ),
         isVoid: true,
@@ -130,12 +154,12 @@ Function(String) onUpdate) async {
 
   chatHistory.addMessage(
     role: LlamaLibraryRole.system,
-    content: jsonDecode(systemPrompt_chat)['content']
+    content: jsonDecode(systemPrompt_chat2)['content']
   );
 
   chatHistory.addMessage(
     role: LlamaLibraryRole.user,
-    content: user_text
+    content: "I'm so glad to see you!"
   );
   
   llamaLibrary.on(
@@ -145,19 +169,18 @@ Function(String) onUpdate) async {
           if (update is UpdateLlamaLibraryMessage) {
             if (update.is_done == false) {
               String newText = update.text ?? '';
-              response += newText;
-              onUpdate(newText);
-              try {
-                // UTF-8로 디코딩 시도
-                final String decodedText = utf8.decode(newText.codeUnits);
-                // // 깨진 문자나 제어 문자 제거
-                final cleanText = decodedText.replaceAll(RegExp(r'[\x00-\x1F\x7F-\x9F]'), '');
-                response += cleanText;
-                onUpdate(cleanText);
-                debugPrint('Text: $cleanText');
-              } catch (e) {
-                debugPrint('디코딩 에러: $e');
-              }
+              debugPrint('encode Text: $newText');
+              // try {
+              //  // UTF-8로 디코딩 시도
+              //  final String decodedText = utf8.decode(newText.codeUnits);
+              //  // // 깨진 문자나 제어 문자 제거
+              //  final cleanText = decodedText.replaceAll(RegExp(r'[\x00-\x1F\x7F-\x9F]'), '');
+              //  response += cleanText;
+              //  onUpdate(cleanText);
+              //  debugPrint('Text: $cleanText');
+              // } catch (e) {
+              //  debugPrint('디코딩 에러: $e');
+              // }
             } else if (update.is_done == true) {
               isDone = true;
               onUpdate("DONE");
@@ -166,25 +189,24 @@ Function(String) onUpdate) async {
         },
       );
 
-    // 메시지 전송 (prompt 포함)
-    await llamaLibrary.invoke(
-      invokeParametersLlamaLibraryData: InvokeParametersLlamaLibraryData(
-        parameters: SendLlamaLibraryMessage.create(
-          text: chatHistory.exportFormat(LlamaLibraryChatFormat.alpaca),
-          is_stream: true,
-        ),
-        isVoid: true,
-        extra: null,
-        invokeParametersLlamaLibraryDataOptions:null,
+    print("chatHistory: ${chatHistory.exportFormat(LlamaLibraryChatFormat.alpaca)}");
+
+    await llamaLibrary.invokeRaw(invokeParametersLlamaLibraryData: InvokeParametersLlamaLibraryData(
+      parameters: SendLlamaLibraryMessage.create(
+        text: chatHistory.exportFormat(LlamaLibraryChatFormat.alpaca),
+        is_stream: true,
       ),
-    );
+      isVoid: true,
+      extra: null,
+      invokeParametersLlamaLibraryDataOptions:null,
+    ));
 
     while (!isDone) {
       await Future.delayed(const Duration(milliseconds: 100));
     }
-    chatHistory.addMessage(
-      role: LlamaLibraryRole.system,
-      content: response
-    );
+    // chatHistory.addMessage(
+    //   role: LlamaLibraryRole.system,
+    //   content: response
+    // );
     return response;
 }

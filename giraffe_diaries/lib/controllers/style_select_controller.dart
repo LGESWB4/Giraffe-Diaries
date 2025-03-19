@@ -1,25 +1,19 @@
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:giraffe_diaries/controllers/image_loading_controller.dart';
 import '../screens/image_loading_screen.dart';
-import '../controllers/image_loading_controller.dart';
 import '../models/diary_entry.dart';
 import '../services/diary_service.dart';
 
 class StyleSelectController extends GetxController {
-  final RxInt selectedStyle = (-1).obs;  // -1은 선택되지 않은 상태
+  final RxInt selectedStyle = (-1).obs; // -1은 선택되지 않은 상태
   final DateTime selectedDate;
   final String contenttext;
-  late final ImageGenerationController imageGenerationController;
 
   StyleSelectController({
     required this.selectedDate,
     required this.contenttext,
-  }) {
-    if (!Get.isRegistered<ImageGenerationController>()) {
-      Get.put(ImageGenerationController());
-    }
-    imageGenerationController = Get.find<ImageGenerationController>();
-  }
+  });
 
   final List<Map<String, String>> styles = [
     {'name': '수채화', 'image': 'assets/images/styles/watercolor.png'},
@@ -39,18 +33,22 @@ class StyleSelectController extends GetxController {
   // 스타일 선택 후 임시 저장 (로컬)
   void onStyleSelected(String style) async {
     final diaryService = Get.find<DiaryService>();
-    
+
     final prefs = await SharedPreferences.getInstance();
-    final username = prefs.getString('nickname') ?? '김덕륜';
+    final username = prefs.getString('username') ?? '';
+
+    final existingEntry = diaryService.getDiaryEntry(selectedDate);
+    print("기존 다이어리 항목: ${existingEntry != null}");
 
     final entry = DiaryEntry(
       username: username,
       date: selectedDate,
       content: contenttext,
       style: style,
-      emotion: "",
-      imageUrl: "",  // 이미지 URL은 비워둠
-      hashtags: [],
+      keywords: existingEntry?.keywords ?? "",
+      emotion: existingEntry?.emotion ?? "",
+      imageUrl: existingEntry?.imageUrl ?? "", // 이미지 URL은 비워둠
+      hashtags: existingEntry?.hashtags ?? [''],
     );
 
     await diaryService.saveDiaryEntry(entry);
@@ -60,8 +58,12 @@ class StyleSelectController extends GetxController {
 
   void skipSelection() {
     onStyleSelected("수채화");
-    //Get.to(() => ImageLoadingScreen(selectedDate: selectedDate, contenttext: contenttext, selectedStyle: "수채화")); // 또는 다음 화면으로 이동하는 로직
-    Get.back();
+    Get.to(
+      () => ImageLoadingScreen(
+        selectedDate: selectedDate,
+        contenttext: contenttext,
+      ),
+    ); // 또는 다음 화면으로 이동하는 로직
   }
 
   void confirmSelection() {
@@ -71,7 +73,13 @@ class StyleSelectController extends GetxController {
       // 임시로 스타일 정보만 저장
       onStyleSelected(selectedStyleName);
 
-      Get.back();
+      // 로딩 화면으로 전환하고 이미지 생성 시작
+      Get.to(
+        () => ImageLoadingScreen(
+          selectedDate: selectedDate,
+          contenttext: contenttext,
+        ),
+      );
     }
   }
 }
