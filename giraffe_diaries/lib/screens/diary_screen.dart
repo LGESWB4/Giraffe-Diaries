@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:giraffe_diaries/screens/home_screen.dart';
+import 'package:giraffe_diaries/screens/style_select_screen.dart';
 import 'package:giraffe_diaries/services/diary_service.dart';
 import '../styles/text_styles.dart';
 import 'chat_dialog.dart';
@@ -14,13 +17,14 @@ class DiaryScreen extends StatefulWidget {
   final String contenttext;
   final String emojiImagePath;
   final String selectedStyle;
-
+  final String generatedImageUrl;
   const DiaryScreen({
     super.key,
     required this.selectedDate,
     required this.contenttext,
     required this.emojiImagePath,
     required this.selectedStyle,
+    required this.generatedImageUrl,
   });
 
   @override
@@ -28,15 +32,20 @@ class DiaryScreen extends StatefulWidget {
 }
 
 class _DiaryScreenState extends State<DiaryScreen> {
-  String generatedImageUrl = '';
-
+  bool isImageLoaded = false;
+  bool isFirstLoaded = true;
   @override
   void initState() {
     super.initState();
+    _checkImageLoaded().then((_) {
+      setState(() {
+        isFirstLoaded = false;
+      });
+    });
   }
 
   Future<void> _saveImage() async {
-    if (generatedImageUrl.isEmpty) {
+    if (widget.generatedImageUrl == '') {
       return;
     }
 
@@ -45,7 +54,7 @@ class _DiaryScreenState extends State<DiaryScreen> {
       print("다이어리 서비스 가져옴");
 
       // 이미지 URL에서 이미지 데이터 다운로드
-      final response = await http.get(Uri.parse(generatedImageUrl));
+      final response = await http.get(Uri.parse(widget.generatedImageUrl));
 
       if (response.statusCode == 200) {
         // Pictures 디렉토리 가져오기
@@ -92,7 +101,7 @@ class _DiaryScreenState extends State<DiaryScreen> {
   }
 
   void _showImageDetail(BuildContext context) {
-    if (generatedImageUrl.isEmpty) {
+    if (widget.generatedImageUrl == '') {
       return;
     }
     showDialog(
@@ -127,7 +136,7 @@ class _DiaryScreenState extends State<DiaryScreen> {
                       minScale: 0.5,
                       maxScale: 4.0,
                       child: Image.network(
-                        generatedImageUrl,
+                        widget.generatedImageUrl,
                         fit: BoxFit.contain,
                       ),
                     ),
@@ -140,16 +149,59 @@ class _DiaryScreenState extends State<DiaryScreen> {
   }
 
   Widget _buildImage() {
-    print("generatedImageUrl: ${generatedImageUrl == ''},");
-    if (generatedImageUrl != '') {
-      return Image.network(generatedImageUrl, fit: BoxFit.cover);
-    } else if (widget.selectedStyle == '') {
-      return Image.asset("assets/images/choose_style.png", fit: BoxFit.cover);
-    } else {
-      return Image.asset(
-        "assets/images/image_generating.png",
-        fit: BoxFit.cover,
+    if (widget.selectedStyle == '') {
+      return GestureDetector(
+        onTap: () {
+          Get.to(
+            () => StyleSelectScreen(
+              selectedDate: widget.selectedDate,
+              contenttext: widget.contenttext,
+            ),
+          );
+        }, // Image tapped
+        child: Image.asset(
+          "assets/images/choose_style.png",
+          fit: BoxFit.contain,
+        ),
       );
+    } else {
+      return GestureDetector(
+        onTap: _checkImageLoaded,
+        child: Image.asset(
+          "assets/images/image_generating.png",
+          fit: BoxFit.contain,
+        ),
+      );
+    }
+  }
+
+  Future<void> _checkImageLoaded() async {
+    if (widget.generatedImageUrl == '') {
+      return;
+    }
+    try {
+      final requestUrl = widget.generatedImageUrl.replaceAll(
+        '/image',
+        '/image/check',
+      );
+      print("requestUrl: $requestUrl");
+      final response = await http.get(
+        Uri.parse(requestUrl),
+        headers: {'Content-Type': 'application/json'},
+      );
+      final data = jsonDecode(response.body);
+      print("data: $data");
+      final isIageExisted = data['file_exists'];
+      if (isIageExisted) {
+        setState(() {
+          isImageLoaded = true;
+        });
+        print("Image request successful, isImageLoaded set to false");
+      } else {
+        print("Image request failed with status: ${response.statusCode}");
+      }
+    } catch (e) {
+      print("Error during image request: $e");
     }
   }
 
@@ -211,17 +263,26 @@ class _DiaryScreenState extends State<DiaryScreen> {
 
                 // 생성된 이미지
                 Center(
-                  child: SizedBox(
-                    width: 300,
-                    height: 300,
-                    child: GestureDetector(
-                      onTap: () => _showImageDetail(context),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(15),
-                        child: _buildImage(),
-                      ),
-                    ),
-                  ),
+                  child:
+                      isFirstLoaded
+                          ? SizedBox(width: 300, height: 300)
+                          : SizedBox(
+                            width: 300,
+                            height: 300,
+                            child: GestureDetector(
+                              onTap: () => _showImageDetail(context),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(15),
+                                child:
+                                    isImageLoaded
+                                        ? Image.network(
+                                          widget.generatedImageUrl,
+                                          fit: BoxFit.cover,
+                                        )
+                                        : _buildImage(),
+                              ),
+                            ),
+                          ),
                 ),
                 const SizedBox(height: 20),
 

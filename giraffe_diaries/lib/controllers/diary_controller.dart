@@ -43,19 +43,19 @@ class DiaryController extends GetxController {
         final updatedEntry = DiaryEntry(
           username: username,
           content: contentController.text,
-          date: existingEntry.date ?? DateTime.now(),
-          emotion: existingEntry.emotion ?? "",
-          hashtags: existingEntry.hashtags ?? [],
-          imageUrl: existingEntry.imageUrl ?? "",
-          style: existingEntry.style ?? "",
-          keywords: existingEntry.keywords ?? "",
+          date: existingEntry.date,
+          emotion: existingEntry.emotion,
+          hashtags: existingEntry.hashtags,
+          imageUrl: existingEntry.imageUrl,
+          style: existingEntry.style,
+          keywords: existingEntry.keywords,
         );
         await diaryService.saveDiaryEntry(updatedEntry);
         print("다이어리 항목(content: ${contentController.text}) 업데이트 완료");
       }
 
       Get.to(
-        ImageLoadingScreen(
+        () => ImageLoadingScreen(
           selectedDate: selectedDate,
           contenttext: contentController.text,
         ),

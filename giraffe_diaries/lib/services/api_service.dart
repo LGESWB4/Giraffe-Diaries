@@ -29,7 +29,7 @@ class ApiService {
       );
 
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
+        final data = jsonDecode(utf8.decode(response.bodyBytes));
         print("data: $data");
         return data['image_path'];
       } else {
@@ -146,19 +146,6 @@ class ApiService {
           if (keywords.startsWith('[') && keywords.endsWith(']')) {
             keywords = keywords.substring(1, keywords.length - 1);
           }
-
-          // final imagePath = await ApiService.generateImage(
-          //   username: username,
-          //   inputWord: keywords,
-          //   month: month,
-          //   date: date,
-          //   styleWord: selectedStyle,
-          //   emotionQuery: mainEmotion,
-          // );
-
-          // // 이미지 URL 생성
-          // final generatedImageUrl = ApiService.getImageUrl(imagePath);
-          // print("generatedImageUrl: $generatedImageUrl");
 
           return [mainEmotion, keywords];
         } catch (e) {
