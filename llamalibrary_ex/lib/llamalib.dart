@@ -13,15 +13,15 @@ import 'package:llama_library/io/models/sampler_params.dart';
 import 'package:llama_library/io/models/model_params.dart';
 import 'package:llama_library/llama_library.dart';
 
-
 final systemPrompt_emotion = jsonEncode({
     "role": "system",
-    "content": "당신은 감정 분석 전문가입니다. 사용자의 일기를 읽고 가장 적절한 감정 1개와 핵심 단어를 JSON 형식으로만 출력하세요.\n\n"
+    "content": "assistant는 감정 분석 전문가 **기린AI**입니다. 사용자의 일기를 읽고 가장 적절한 감정 1개와 핵심 단어를 JSON 형식으로만 출력하세요.\n\n"
     "🔹 **감정 선택:**\n"
     "다음 목록에서 **가장 적절한 감정 1개**를 선택하세요.\n"
     "['기쁨', '행복', '만족', '애정 표현', '즐거움', '자신감', '놀람', '슬픔', '우울', '걱정', '불만', '화남', '두려움', '긴장', '실망', '혼란', '아픔']\n\n"
     "🔹 **핵심 단어:**\n"
-    "일기의 주제를 반영하는 **최대 4개의 키워드**를 선정하세요.\n\n"
+    "일기의 주제를 반영하는 **최대 4개의 키워드**만을 선정하세요.\n\n"
+    "📌 **총 응답 길이는 50단어 이하로 제한하세요.**\n"
     "📌 **반드시 아래 JSON 형식으로만 출력하세요.**\n"
     "```json\n"
     "{\n"
@@ -29,26 +29,25 @@ final systemPrompt_emotion = jsonEncode({
     "    \"Keywords\": [\"단어1\", \"단어2\", \"단어3\", \"단어4\"]\n"
     "}\n"
     "```\n"
-    "🚨 **설명 없이 JSON 형식으로만 출력하세요!**"
 });
-
 
 final systemPrompt_chat = jsonEncode({
     "role": "system",
-    "content": "당신은 감정을 공감하며 대화하는 감성 챗봇입니다.\n"
+    "content": "assistant는 감정을 공감하며 대화하는 감성 챗봇 **기린AI**입니다.\n"
     "항상 **존댓말**을 사용하고, 따뜻하고 자연스러운 말투로 대화하세요.\n\n"
     "🔹 **대화 원칙:**\n"
     "1️⃣ **공감 표현:** 사용자의 감정에 맞게 '정말 힘드셨겠어요.', '좋은 하루였네요!'처럼 적절히 반응하세요.\n"
     "2️⃣ **자연스러운 질문:** 사용자가 더 이야기하고 싶게 부드러운 질문을 던지세요.\n"
     "3️⃣ **부담 없는 대화:** 친구처럼 다정한 말투를 유지하세요.\n"
     "4️⃣ **개인정보 보호:** 이름, 위치 등 개인 정보를 요청하지 마세요.\n\n"
+    "📌 **응답은 100단어 이하로 작성하세요.**\n\n"
     "🔹 **예시:**\n"
     "사용자: 오늘 너무 피곤해요...\n"
-    "→ 챗봇: 정말 고생 많으셨어요. 하루 종일 바쁘셨나요? 😢\n\n"
+    "→ **기린AI**: 정말 고생 많으셨어요. 하루 종일 바쁘셨나요? 😢\n\n"
     "사용자: 친구랑 빵집 갔어요!\n"
-    "→ 챗봇: 우와! 어떤 빵이 가장 맛있었나요? 🥐\n\n"
+    "→ **기린AI**: 우와! 어떤 빵이 가장 맛있었나요? 🥐\n\n"
     "사용자: 기분이 싱숭생숭해요.\n"
-    "→ 챗봇: 그럴 때 있죠. 😌 혹시 무슨 일이 있었나요?"
+    "→ **기린AI**: 그럴 때 있죠. 😌 혹시 무슨 일이 있었나요?"
 });
 
 
@@ -75,9 +74,6 @@ class LlamaChatService {
   Future<void> _initialize() async {
     await llamaLibrary.ensureInitialized();
     await llamaLibrary.initialized();
-
-
-
     await _loadModel();
 
   }
@@ -103,12 +99,21 @@ class LlamaChatService {
         isVoid: false,
         extra: null,
         invokeParametersLlamaLibraryDataOptions: null,
-
       ),
     );
-    debugPrint("모델 로드 직후: LLamaModelParams: ${LLamaModelParams().useMemoryLock}");
-    debugPrint("모델 로드 직후: LLamaContextParams: ${LLamaContextParams().nThreads}");
 
+    final res = await llamaLibrary.invoke(
+      invokeParametersLlamaLibraryData: InvokeParametersLlamaLibraryData(
+        parameters: .create(
+          model_file_path: modelPath,
+        ),
+        isVoid: false,
+        extra: null,
+        invokeParametersLlamaLibraryDataOptions: null,
+      ),
+    );
+
+    print("res: $res");
     if (res["@type"] == "ok") {
       print("Success load Model");
     } else {
@@ -125,8 +130,7 @@ class LlamaChatService {
       content: userPrompt
     );
 
-    String chatHistory_text = chatHistory.exportFormat(LlamaLibraryChatFormat.alpaca);
-    debugPrint("chatHistory_text: $chatHistory_text");
+    String chatHistory_text = systemPrompt_emotion;
 
     currentResponse = '';
     String utf8response = '';
@@ -146,10 +150,10 @@ class LlamaChatService {
                 // UTF-8 디코딩 시도
                 try {
                   final String utf8Decoded = utf8.decode(update.text!.codeUnits);
-                  //debugPrint('UTF-8 디코딩 결과: $utf8Decoded');
+                  debugPrint('UTF-8 디코딩 결과: $utf8Decoded');
                   utf8response = utf8Decoded;
                 } catch (e) {
-                  //debugPrint('UTF-8 디코딩 실패: $e');
+                  debugPrint('UTF-8 디코딩 실패: $e');
                 }
 
                 // JSON 디코딩 시도
@@ -162,7 +166,7 @@ class LlamaChatService {
                 }
 
                 // 현재는 원본 텍스트 사용
-                currentResponse += update.text!;
+                currentResponse += utf8response;
                 onResponseUpdate(currentResponse);
               } catch (e) {
                 debugPrint('텍스트 처리 중 오류 발생: $e');
@@ -219,7 +223,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
     chatHistory.clear();
 
-    final systemPrompt = systemPrompt_emotion;
+    final systemPrompt = systemPrompt_chat;
 
     chatHistory.addMessage(
       role: LlamaLibraryRole.system,
