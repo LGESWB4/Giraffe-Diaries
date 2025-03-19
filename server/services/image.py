@@ -12,7 +12,7 @@ import os
 
 load_dotenv()
 
-def generate_diary_image(imageDto: ImageDto):
+def generate_diary_image(imageDto: ImageDto):    
     # 영어로 번역
     prompt = translate_and_generate_prompt(imageDto.input_word,imageDto.style_word,imageDto.emotion_query)
     
