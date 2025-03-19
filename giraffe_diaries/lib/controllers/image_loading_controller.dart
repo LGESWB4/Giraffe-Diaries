@@ -10,12 +10,13 @@ import '../models/diary_entry.dart';
 import '../services/diary_service.dart';
 import 'package:flutter/foundation.dart';
 
+// 감정 생성 컨트롤러입니다
 class ImageGenerationController extends GetxController {
   final RxBool isLoading = false.obs;
   final RxString generatedImageUrl = ''.obs;
   late LlamaLibrary llamaLibrary;
 
-  Future<void> generateImage(DateTime selectedDate, String contenttext, String selectedStyle) async {
+  Future<void> generateImage(DateTime selectedDate, String contenttext) async {
     try {
       isLoading.value = true;
       // llamaLibrary = await modelLoad();
@@ -38,21 +39,21 @@ class ImageGenerationController extends GetxController {
       // 날짜 포맷팅
       final month = selectedDate.month.toString().padLeft(2, '0');
       final date = selectedDate.day.toString().padLeft(2, '0');
+      print("month: $month");
+      print("date: $date");
 
       // print("감정 데이터 분석 시작");
       final returnData = await ApiService.getEmotion(
-          username, month, date, selectedStyle, contenttext);
+        username,
+        month,
+        date,
+        contenttext,
+      );
       // API 호출하여 이미지 생성
-      final imagePath = returnData[0];
-      final mainEmotion = returnData[1];
-      print("생성된 이미지 경로: $imagePath");
-
-      // 컨텐츠에서 키워드 추출 (예시: 쉼표로 구분된 첫 3개 단어)
-      final keywords = contenttext.split(' ').take(3).join(', ');
-
-      // 이미지 URL 생성
-      generatedImageUrl.value = ApiService.getImageUrl(imagePath);
-      print("generatedImageUrl: ${generatedImageUrl.value}");
+      final mainEmotion = returnData[0];
+      final keywords = returnData[1];
+      print("mainEmotion: $mainEmotion");
+      print("keywords: $keywords");
 
       // 다이어리 엔트리 업데이트
       final diaryService = Get.find<DiaryService>();
@@ -61,30 +62,31 @@ class ImageGenerationController extends GetxController {
       final existingEntry = diaryService.getDiaryEntry(selectedDate);
       print("기존 다이어리 항목: ${existingEntry != null}");
 
-      if (existingEntry != null) {
-        final updatedEntry = DiaryEntry(
-          username: username,
-          date: existingEntry.date,
-          content: existingEntry.content,
-          style: existingEntry.style,
-          emotion: mainEmotion,
-          imageUrl: generatedImageUrl.value,
-          hashtags: existingEntry.hashtags,
-        );
-        await diaryService.saveDiaryEntry(updatedEntry);
-        print("다이어리 항목 업데이트 완료");
-      }
+      final updatedEntry = DiaryEntry(
+        username: username,
+        date: selectedDate,
+        content: contenttext,
+        style: existingEntry?.style ?? '',
+        emotion: mainEmotion,
+        imageUrl: '',
+        hashtags: existingEntry?.hashtags ?? [],
+        keywords: keywords,
+      );
+      await diaryService.saveDiaryEntry(updatedEntry);
+      print("다이어리 항목 업데이트 완료");
 
       String emojiImagePath = getEmojiPath(mainEmotion);
 
       // 이미지 화면으로 이동
       print("DiaryScreen으로 이동");
-      Get.off(() => DiaryScreen(
-            generatedImageUrl: generatedImageUrl.value,
-            selectedDate: selectedDate,
-            contenttext: contenttext,
-            emojiImage: emojiImagePath,
-          ));
+      Get.off(
+        () => DiaryScreen(
+          selectedDate: selectedDate,
+          contenttext: contenttext,
+          emojiImagePath: emojiImagePath,
+          selectedStyle: '',
+        ),
+      );
       print("화면 전환 완료");
     } catch (e) {
       print("모델 실행 중 오류 발생: $e");

@@ -7,13 +7,11 @@ import '../styles/text_styles.dart';
 class ImageLoadingScreen extends StatefulWidget {
   final DateTime selectedDate;
   final String contenttext;
-  final String selectedStyle;
 
   const ImageLoadingScreen({
     super.key,
     required this.selectedDate,
     required this.contenttext,
-    required this.selectedStyle,
   });
 
   @override
@@ -21,12 +19,13 @@ class ImageLoadingScreen extends StatefulWidget {
 }
 
 class _ImageLoadingScreenState extends State<ImageLoadingScreen> {
-  final ImageGenerationController _controller = Get.find<ImageGenerationController>();
+  final ImageGenerationController _controller =
+      Get.find<ImageGenerationController>();
   int _currentImageIndex = 1;
   late Timer _imageTimer;
   final List<String> _loadingTexts = [
-    'AI가 그림을 그리고 있어요...',
-    '멋진 그림을 그리는 중이에요...',
+    'AI가 일기를 요약하고 있어요...',
+    '당신의 감정을 분석하고 있어요...',
     '조금만 더 기다려주세요...',
   ];
   int _currentTextIndex = 0;
@@ -37,7 +36,8 @@ class _ImageLoadingScreenState extends State<ImageLoadingScreen> {
     // 이미지 애니메이션 시작
     _imageTimer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
       setState(() {
-        _currentImageIndex = _currentImageIndex == 6 ? 1 : _currentImageIndex + 1;
+        _currentImageIndex =
+            _currentImageIndex == 6 ? 1 : _currentImageIndex + 1;
       });
     });
 
@@ -51,7 +51,7 @@ class _ImageLoadingScreenState extends State<ImageLoadingScreen> {
     });
 
     // AI 이미지 생성 시작
-    _controller.generateImage(widget.selectedDate, widget.contenttext, widget.selectedStyle);
+    _controller.generateImage(widget.selectedDate, widget.contenttext);
   }
 
   @override

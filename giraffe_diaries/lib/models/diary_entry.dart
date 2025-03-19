@@ -6,6 +6,7 @@ class DiaryEntry {
   final List<String> hashtags;
   final String imageUrl;
   final String style;
+  final String keywords;
 
   DiaryEntry({
     required this.username,
@@ -15,6 +16,7 @@ class DiaryEntry {
     required this.hashtags,
     required this.imageUrl,
     required this.style,
+    required this.keywords,
   });
 
   factory DiaryEntry.fromJson(Map<String, dynamic> json) {
@@ -26,18 +28,20 @@ class DiaryEntry {
       hashtags: List<String>.from(json['hashtags']),
       imageUrl: json['imageUrl'],
       style: json['style'],
+      keywords: json['keywords'],
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'username' : username,
+      'username': username,
       'date': date.toIso8601String(),
       'content': content,
       'emotion': emotion,
       'hashtags': hashtags,
       'imageUrl': imageUrl,
       'style': style,
+      'keywords': keywords,
     };
   }
 }

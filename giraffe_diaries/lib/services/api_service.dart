@@ -44,7 +44,6 @@ class ApiService {
     return '$baseUrl/image/$imagePath';
   }
 
-
   static Future<String> chatAPI({
     required String username,
     required String inputWord,
@@ -79,8 +78,12 @@ class ApiService {
     }
   }
 
-  static Future<List<String>> getEmotion(String username, String month,
-      String date, String selectedStyle, String contenttext) async {
+  static Future<List<String>> getEmotion(
+    String username,
+    String month,
+    String date,
+    String contenttext,
+  ) async {
     try {
       const url = 'http://35.206.251.58:8080/v1/chat/completions';
       var body = {
@@ -144,16 +147,20 @@ class ApiService {
             keywords = keywords.substring(1, keywords.length - 1);
           }
 
-          final imagePath = await ApiService.generateImage(
-            username: username,
-            inputWord: keywords,
-            month: month,
-            date: date,
-            styleWord: selectedStyle,
-            emotionQuery: mainEmotion,
-          );
+          // final imagePath = await ApiService.generateImage(
+          //   username: username,
+          //   inputWord: keywords,
+          //   month: month,
+          //   date: date,
+          //   styleWord: selectedStyle,
+          //   emotionQuery: mainEmotion,
+          // );
 
-          return [imagePath, mainEmotion];
+          // // 이미지 URL 생성
+          // final generatedImageUrl = ApiService.getImageUrl(imagePath);
+          // print("generatedImageUrl: $generatedImageUrl");
+
+          return [mainEmotion, keywords];
         } catch (e) {
           // JSON 파싱에 실패한 경우, 문자열 기반으로 판단
           print("JSON 파싱 실패, 문자열 기반으로 판단: $e");
