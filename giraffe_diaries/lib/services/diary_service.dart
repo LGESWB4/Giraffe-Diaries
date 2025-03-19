@@ -57,12 +57,12 @@ class DiaryService extends GetxService {
     final diary = _entries[key];
     if (diary != null) {
       print('닉네임: ${diary.username}');
-      print('=== $date 일기 ===');
+      print('=== ${date} 일기 ===');
       print('내용: ${diary.content}');
       print('감정: ${diary.emotion}');
       print('선택된 스타일: ${diary.style}');
     } else {
-      print('$date에 저장된 일기가 없습니다.');
+      print('${date}에 저장된 일기가 없습니다.');
     }
   }
 }

@@ -76,33 +76,33 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        try {
-            // Get SoC model from build properties
-            HashMap<String, String> supportedSocModel = new HashMap<>();
-            supportedSocModel.putIfAbsent("SM8750", "qualcomm-snapdragon-8-elite.json");
-            supportedSocModel.putIfAbsent("SM8650", "qualcomm-snapdragon-8-gen3.json");
-            supportedSocModel.putIfAbsent("QCS8550", "qualcomm-snapdragon-8-gen2.json");
-
-            String socModel = android.os.Build.SOC_MODEL;
-            if (!supportedSocModel.containsKey(socModel)) {
-                String errorMsg = "Unsupported device. Please ensure you have one of the following device to run the ChatApp: " + supportedSocModel.toString();
-                Log.e("ChatApp", errorMsg);
-                Toast.makeText(this, errorMsg, Toast.LENGTH_LONG).show();
-                finish();
-            }
-
-            // Copy assets to External cache
-            String externalDir = getExternalCacheDir().getAbsolutePath();
-            try {
-                copyAssetsDir("models", externalDir.toString());
-                copyAssetsDir("htp_config", externalDir.toString());
-            } catch (IOException e) {
-                String errorMsg = "Error during copying model asset to external storage: " + e.toString();
-                Log.e("ChatApp", errorMsg);
-                Toast.makeText(this, errorMsg, Toast.LENGTH_SHORT).show();
-                finish();
-            }
-            Path htpExtConfigPath = Paths.get(externalDir, "htp_config", supportedSocModel.get(socModel));
+//        try {
+//            // Get SoC model from build properties
+//            HashMap<String, String> supportedSocModel = new HashMap<>();
+//            supportedSocModel.putIfAbsent("SM8750", "qualcomm-snapdragon-8-elite.json");
+//            supportedSocModel.putIfAbsent("SM8650", "qualcomm-snapdragon-8-gen3.json");
+//            supportedSocModel.putIfAbsent("QCS8550", "qualcomm-snapdragon-8-gen2.json");
+//
+//            String socModel = android.os.Build.SOC_MODEL;
+//            if (!supportedSocModel.containsKey(socModel)) {
+//                String errorMsg = "Unsupported device. Please ensure you have one of the following device to run the ChatApp: " + supportedSocModel.toString();
+//                Log.e("ChatApp", errorMsg);
+//                Toast.makeText(this, errorMsg, Toast.LENGTH_LONG).show();
+//                finish();
+//            }
+//
+//            // Copy assets to External cache
+//            String externalDir = getExternalCacheDir().getAbsolutePath();
+//            try {
+//                copyAssetsDir("models", externalDir.toString());
+//                copyAssetsDir("htp_config", externalDir.toString());
+//            } catch (IOException e) {
+//                String errorMsg = "Error during copying model asset to external storage: " + e.toString();
+//                Log.e("ChatApp", errorMsg);
+//                Toast.makeText(this, errorMsg, Toast.LENGTH_SHORT).show();
+//                finish();
+//            }
+//            Path htpExtConfigPath = Paths.get(externalDir, "htp_config", supportedSocModel.get(socModel));
 
             setContentView(R.layout.activity_main);
 

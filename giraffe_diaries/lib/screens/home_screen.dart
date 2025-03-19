@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:giraffe_diaries/controllers/emoji_controller.dart';
+import 'package:giraffe_diaries/screens/diary_screen.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../controllers/calendar_controller.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -69,7 +71,13 @@ class HomeScreen extends GetView<CalendarController> {
     final diaryEntry = Get.find<DiaryService>().getDiaryEntry(selectedDate);
     if (diaryEntry != null) {
       // 일기 보기 화면으로 이동
-      // Get.to(() => DiaryViewScreen(diaryEntry: diaryEntry));
+      String emojiImagePath = getEmojiPath(diaryEntry.emotion);
+      Get.to(() => DiaryScreen(
+            generatedImageUrl: diaryEntry.imageUrl,
+            selectedDate: selectedDate,
+            contenttext: diaryEntry.content,
+            emojiImage: emojiImagePath,
+          ));
     } else{
       showDiaryWriteScreen(selectedDate);
     }
@@ -226,22 +234,24 @@ class HomeScreen extends GetView<CalendarController> {
                             ),
                           );
                         }
-
+                        print("date: $date");
                         // 일기가 있는 날짜는 이모지로 표시
-                        if (events.isNotEmpty) {
-                          final diaryEntry = Get.find<DiaryService>().getDiaryEntry(date);
-                          if (diaryEntry != null) {
-                            return Container(
-                              width: 35,
-                              height: 35,
-                              margin: const EdgeInsets.only(top: 12),
-                              child: Image.asset(
-                                'assets/emoji_images/${diaryEntry.emotion}_emoji.png',
-                                fit: BoxFit.contain,
-                              ),
-                            );
-                          }
-                        }
+                        final diaryEntry =
+                                Get.find<DiaryService>().getDiaryEntry(date);
+                        print("diaryEntry: $diaryEntry");
+                        if (diaryEntry != null) {
+                              String emojiImagePath =
+                                  getEmojiPath(diaryEntry.emotion);
+                              return Container(
+                                width: 35,
+                                height: 35,
+                                margin: const EdgeInsets.only(top: 12),
+                                child: Image.asset(
+                                  emojiImagePath,
+                                  fit: BoxFit.contain,
+                                ),
+                              );
+                            }
 
                         // 과거 날짜는 기본 마커로 표시
                         if (targetDate.isBefore(today)) {

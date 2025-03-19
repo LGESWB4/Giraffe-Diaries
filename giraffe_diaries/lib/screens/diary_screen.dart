@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:giraffe_diaries/screens/home_screen.dart';
 import '../styles/text_styles.dart';
 import 'chat_dialog.dart';
 
@@ -7,15 +8,15 @@ class DiaryScreen extends StatelessWidget {
   final String generatedImageUrl;
   final String contenttext;
   final List<String> hashtags = ['멋짐', '자신감'];
-  final String emojiImage = 'assets/emoji_images/cool_emoji.jpg';
+  String emojiImage;
   final DateTime selectedDate;
 
   DiaryScreen({
     super.key,
     required this.generatedImageUrl,
     required this.selectedDate,
-
     required this.contenttext,
+    required this.emojiImage,
   });
 
   void _showImageDetail(BuildContext context) {
@@ -87,6 +88,10 @@ class DiaryScreen extends StatelessWidget {
               // TODO: 메뉴 기능 구현
             },
           ),
+          IconButton(
+            icon: const Icon(Icons.close, color: Colors.black),
+            onPressed: () => Get.offAll(const HomeScreen()),
+          ),
           const SizedBox(width: 8),
         ],
       ),
@@ -119,28 +124,7 @@ class DiaryScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-                const SizedBox(height: 20),
-                
-                // 해시태그
-                Center(
-                  child: Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    alignment: WrapAlignment.center,
-                    children: hashtags.map((tag) => Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF7F7F7),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        '#$tag',
-                        style: AppTextStyles.bodyLarge,
-                      ),
-                    )).toList(),
-                  ),
-                ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 80),
                 
                 // 생성된 이미지
                 Center(
