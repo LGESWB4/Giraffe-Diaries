@@ -1,8 +1,11 @@
+import os
 import subprocess
 
 # **GGUF 모델 및 실행 파일 경로**
 LLAMA_CLI_PATH = "/home/moons98.in/Giraffe-Diaries/llama.cpp/build/bin/llama-cli"
-GGUF_MODEL_PATH = "/home/moons98.in/Giraffe-Diaries/model/ko-llm/weights/Llama-3.2-3B-Instruct/Llama-3.2-3B-Instruct-BF16.gguf"
+
+BASE_PATH = "/home/moons98.in/Giraffe-Diaries/model/ko-llm/weights/"
+GGUF_MODEL_PATH = os.path.join(BASE_PATH, "Llama-3-Mopeyfied-Psychology-v2.Q4_K_M.gguf")
 
 def run_chat():
     """
