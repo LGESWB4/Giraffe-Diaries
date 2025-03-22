@@ -1,0 +1,10 @@
+
+diffusers[torch]
+transformers 
+accelerate 
+scipy 
+safetensors
+invisible_watermark
+bitsandbytes
+
+google-cloud-translate

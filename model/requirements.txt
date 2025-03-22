@@ -1,0 +1,14 @@
+# for qai build
+# qai_hub_models[llama-v3_2-3b-chat-quantized]
+# qai_hub_models[stable_diffusion_v2_1_quantized]
+
+transformers 
+accelerate
+huggingface_hub[cli]
+
+torch==2.4.1 
+torchvision 
+torchaudio
+
+jupyter
+ipykernel
