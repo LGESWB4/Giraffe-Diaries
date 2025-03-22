@@ -4,8 +4,6 @@
 네가 그린 그림 일기(Giraffe-Diaries)는 사용자가 그림을 그리면 해당 그림을 인식하여 일기를 작성할 수 있도록 도와주는 애플리케이션입니다.
 
 
-
-
 ## 주요 기능
 
 - **일기 작성**: User가 매일매일의 일기 작성을 할 수 있습니다..
@@ -13,7 +11,7 @@
 - **AI 채팅**:on device AI로 sLLM 모델과의 채팅을 할 수 있습니다.
 - **그림 생성**: 감정 분석을 통한 감정, 키워드 추출기반으로 server AI(stable diffusion)를 통해 그림을 생성합니다. (원하는 그림의 화풍을 선택할 수 있습니다.) 
 - **플랫폼 지원**: 현재 Android에서만 사용 가능합니다. (sLLM 모델 로드 관련 issue)
-![표지](https://github.com/user-attachments/assets/4316a9a4-91b4-418a-a0a9-2cc42f736b22) ![INTRO](htps://github.com/user-attachments/assets/c8e34e09-2ba0-4d59-b723-32979aa43de6)
+![표지](https://github.com/user-attachments/assets/4316a9a4-91b4-418a-a0a9-2cc42f736b22) ![INTRO](https://github.com/user-attachments/assets/24597c06-eb37-4ea7-b549-4f26e5515d89)
 ![APP](https://github.com/user-attachments/assets/bc0b4186-0b65-42a4-9ffc-989ad812b30e) ![MODEL](https://github.com/user-attachments/assets/52441f60-ef43-49fd-b3f5-9e6321eedb9e)
 
 
@@ -68,5 +66,4 @@
 4. 이미지 생성 버튼을 통해 원하는 화풍을 선택하고 일정 시간 이후 감정과 키워드 기반의 그림이 생성됩니다.
 5. 그 날의 감정을 떠올리며 on Device sLLM AI모델과 대화해보세요!
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/영상ID](https://youtube.com/shorts/R0ej2wA7h6Y)" frameborder="0" allowfullscreen></iframe>
-
+<iframe width="560" height="315" src="https://youtube.com/shorts/R0ej2wA7h6Y" frameborder="0" allowfullscreen></iframe>
