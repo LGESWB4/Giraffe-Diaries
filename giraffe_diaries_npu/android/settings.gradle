@@ -1,0 +1,23 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        google()
+        mavenCentral()
+    }
+}
+
+dependencyResolutionManagement {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+/** Project Name **/
+rootProject.name = "Qualcomm AI Hub Android Sample Apps"
+
+/** Applications **/
+
+if (Boolean.valueOf(properties["includeChatApp"])) {
+    include ':ChatApp'
+}
